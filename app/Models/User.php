@@ -23,6 +23,8 @@ class User {
 
     public function logout(){}
 
+    public function uploadImageAvatar($avatar){}
+
 }
 
 ?>
