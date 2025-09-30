@@ -1,0 +1,14 @@
+# В начале файла добавьте эту строку
+DirectoryIndex index.php
+
+Options +FollowSymLinks -Indexes
+RewriteEngine On
+
+# Обработка авторизации
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Перенаправление всех запросов на index.php
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [L]
