@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 require_once(__DIR__ . "/../vendor/autoload.php");
 // require_once(__DIR__ . "/../app/config/dbconnect.php");
@@ -9,16 +10,24 @@ use App\Models\Post;
 // $user1 = new User();
 
 //// Регистрация пользователя
-// $result = $user1->registration("example9@mail.com", "TEst22", "test2User"); 
-// echo $result;
+// $user1->registration("example3@mail.com", "Test112", "USer3 LAstName3"); 
+// echo "Привет " . $user1->getUsername();
+// echo "Твой ID: " . $user1->getId();
+// echo "Твой email: " . $user1->getEmail();
+
 
 //// Авторизация пользователя
-// $result = $user1->login("example8@mail.com", "Testik");
-// echo $result;
+// $user1->login("example3@mail.com", "Test112");
+// $_SESSION["email"] = $user1->getEmail();
+// $_SESSION["username"] = $user1->getUsername();
+// echo "Email: " . $_SESSION["email"] . "Имя: " . $_SESSION["username"];
 
 //// Деавторизация пользователя
-// $result = $user1->logout();
-// echo $result;
+// $user1->logout();
+// echo $user1->getId();
+// echo $user1->getEmail();
+// echo $user1->getUsername();
+
 
 //// Геттеры. Получения отдельных данных по авторизованному пользователю
 // $result = $user1->getId();
@@ -35,25 +44,51 @@ use App\Models\Post;
 $post = new Post();
 
 //// Добавление нового поста
-// $result = $post->addPost("Заголовок №4", "Описание №4", "/src/images/image4");
+// $post->addPost("Заголовок №5", "Новый пост №5", "/src/images/imags115");
+// echo $post->getId();
+// echo $post->getTitle();
+// echo $post->getDatePublished();
+// dd($res);
+
+// Получение объекта данных по конкретному посту при передачи ID-поста
+// $res = $post->getPostById(50);
+// dd($res);
 // echo $result;
 
 //// Изменение существующего поста
-// $result = $post->editPost(26, "", "Desc6", "");
+// $result = $post->editPost(64, "Title post 64!! Super!", "Desc6", "/image/super64.jpeg");
 // echo $result;
 
 //// Удаление поста
-// $result = $post->deletePost(181);
+// $result = $post->deletePost(64);
 // echo $result;
 
 //// Получение всех постов
-// $result = $post->getAllPosts();
-// var_dump($result);
+// $result = $post->getAllPosts()->result();
+// foreach ($result as $post) {
+//     var_dump($post->id);
+// }
 
 //// Помещение поста В архив
-// $result = $post->archive(17);
-// echo $result;
+// $post->archive(50);
+// $res = $post->getPostById(50);
+// dd($res);
 
 //// Перемещение поста ИЗ архив
-// $result = $post->unarchive(17);
-// echo $result;
+// $post->unarchive(50);
+// $res = $post->getPostById(50);
+// dd($res);
+
+//// Загрузка картинки
+// $post->uploadImage($_FILES["image"], 37);
+
+//// Удаление картинки
+// $post->deleteImage(37);
+
+?>
+
+<form action="" method="post" enctype="multipart/form-data">
+    <label for="image">Загрузите картинку</label>
+    <input type="file" name="image"><br>
+    <button type="submit">Отправить</button>
+</form>

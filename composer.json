@@ -1,6 +1,7 @@
 {
   "require": {},
   "autoload": {
+    "files": ["dumper.php"],
     "psr-4": {
       "App\\": "app/"
     }
