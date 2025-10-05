@@ -1,4 +1,6 @@
 <?php
+
+use LDAP\Result;
 session_start();
 
 require_once(__DIR__ . "/../vendor/autoload.php");
@@ -6,18 +8,21 @@ require_once(__DIR__ . "/../vendor/autoload.php");
 
 use App\Models\User;
 use App\Models\Post;
+use App\Config\GetDataConfig;
+use App\Database\Connection;
+use App\Database\QueryBuilder;
 
-// $user1 = new User();
+// $user1 = new User(new QueryBuilder(Connection::Connect()));
 
 //// Регистрация пользователя
-// $user1->registration("example3@mail.com", "Test112", "USer3 LAstName3"); 
+// $user1->registration("newUser6@mail.com", "111", "New user Name 6"); 
 // echo "Привет " . $user1->getUsername();
 // echo "Твой ID: " . $user1->getId();
 // echo "Твой email: " . $user1->getEmail();
 
 
 //// Авторизация пользователя
-// $user1->login("example3@mail.com", "Test112");
+// $user1->login("newUser6@mail.com", "111");
 // $_SESSION["email"] = $user1->getEmail();
 // $_SESSION["username"] = $user1->getUsername();
 // echo "Email: " . $_SESSION["email"] . "Имя: " . $_SESSION["username"];
@@ -41,49 +46,77 @@ use App\Models\Post;
 
 //============================================================
 
-$post = new Post();
+$post = new Post(new QueryBuilder(Connection::Connect()));
 
 //// Добавление нового поста
-// $post->addPost("Заголовок №5", "Новый пост №5", "/src/images/imags115");
+// $post->addPost("Zagolobok 21", "tut tekst12321_21", $_FILES["image"]);
 // echo $post->getId();
 // echo $post->getTitle();
 // echo $post->getDatePublished();
+// echo $post->getImagePost();
 // dd($res);
 
 // Получение объекта данных по конкретному посту при передачи ID-поста
-// $res = $post->getPostById(50);
+// $res = $post->getPostById(90);
 // dd($res);
-// echo $result;
 
 //// Изменение существующего поста
-// $result = $post->editPost(64, "Title post 64!! Super!", "Desc6", "/image/super64.jpeg");
+// $result = $post->editPost(91, "12tdfgfgggWWWZZZWW1", "ZZZ", $_FILES["image"]);
 // echo $result;
 
 //// Удаление поста
-// $result = $post->deletePost(64);
+// $result = $post->deletePost(92);
 // echo $result;
 
 //// Получение всех постов
 // $result = $post->getAllPosts()->result();
 // foreach ($result as $post) {
-//     var_dump($post->id);
+//     var_dump($post->title);
 // }
 
 //// Помещение поста В архив
-// $post->archive(50);
-// $res = $post->getPostById(50);
+// $res = $post->archive(91);
 // dd($res);
 
 //// Перемещение поста ИЗ архив
-// $post->unarchive(50);
-// $res = $post->getPostById(50);
+// $res = $post->unarchive(91);
 // dd($res);
 
 //// Загрузка картинки
-// $post->uploadImage($_FILES["image"], 37);
+$post->uploadImage($_FILES["image"], 39);
 
 //// Удаление картинки
-// $post->deleteImage(37);
+// $post->deleteImage(89);
+
+
+//// Работа с БД
+// $res = GetDataConfig::Get("mysql.db"); // Получаем значение по переданному пути ключей из глобального конфига.
+// dd($res);
+
+// $db = Connection::Connect(); // Получаем подключение к БД реализованное через PDO - возвращается сам объект PDO.
+// dd($db);
+
+
+// $db = new QueryBuilder(Connection::Connect());
+// $res = $db->getAll("posts"); // Получить все значения из таблицы БД
+// dd($res); // Вернёт полный объекта класса QueryBuilder
+// dd($res->result()); // Вернёт массив объектов всех полученных результатов из запроса
+// dd($res->getOneResult()); // Вернёт ПЕРВЫЙ объект данных и результата запроса
+
+// $res = $db->getByCondition("posts", "LIKE", ["description", "id", "image_post"], ["description" => "%desc%"]); // Получить значение/значения из таблицы БД по переданному условию
+// dd($res);
+
+// $res = $db->insert("posts", [
+//     "title" => "Проверочка",
+//     "description" => "123321",
+//     "image_post" => "/img/postsimage_1_68df014f58401_17test.jpg"
+// ]); // Добавление данных в таблицу БД
+// dd($res);
+
+// $db->update("posts", "=", ["title" => "checkUpdateQuery_1_TITLE"], ["id" => 76]); // Обновление данных в БД по заданному условию отбора записи/записей и переданному ассоциативному массиву полей=>значений для изменения этих полей и их значений в БД по конкретной записи/записям в таблице
+
+// $db->delete("posts", 72); // Удаление данных из таблицы по преданному идентификатору записи в БД
+
 
 ?>
 

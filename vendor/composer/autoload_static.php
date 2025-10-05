@@ -13,11 +13,16 @@ class ComposerStaticInit8d070178755c320c69f93ee4800660ef
     public static $prefixLengthsPsr4 = array (
         'A' => 
         array (
+            'Aura\\SqlQuery\\' => 14,
             'App\\' => 4,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'Aura\\SqlQuery\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aura/sqlquery/src',
+        ),
         'App\\' => 
         array (
             0 => __DIR__ . '/../..' . '/app',

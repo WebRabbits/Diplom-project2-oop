@@ -1,5 +1,7 @@
 {
-  "require": {},
+  "require": {
+    "aura/sqlquery": "^3.0"
+  },
   "autoload": {
     "files": ["dumper.php"],
     "psr-4": {

@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Models;
+use App\Database\QueryBuilder;
 
 use PDO;
 
-require_once(__DIR__ . "/../config/dbconnect.php");
+// require_once(__DIR__ . "/../config/dbconnect.php");
 
 class User
 {
@@ -12,19 +13,19 @@ class User
     private string $email;
     private string $password;
     private string $username;
-    private PDO $db;
+    private QueryBuilder $db;
 
-    public function __construct($email = "", $password = "", $username = "")
+
+    public function __construct(QueryBuilder $pdo, $email = "", $password = "", $username = "")
     {
         $this->email = $email;
         $this->password = $password;
         $this->username = $username;
-        $this->db = getPDO();
+        $this->db = $pdo;
     }
 
     public function registration($email, $password, $username)
     {
-
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             echo "Некорректный Email-адрес";
             return;
@@ -32,20 +33,27 @@ class User
 
         $hash_password = password_hash($password, PASSWORD_DEFAULT);
 
-        $stmt = $this->db->prepare("SELECT `email` FROM `users` WHERE email = ?");
-        $stmt->execute([$email]);
-        $userData = $stmt->fetch(PDO::FETCH_OBJ);
-
+        $userData = $this->db->getByCondition(table:"users", operator:"=", columns: ["*"],where: ["email" => $email])->getOneResult();
+        
+        // $stmt = $this->db1->prepare("SELECT `email` FROM `users` WHERE email = ?");
+        // $stmt->execute([$email]);
+        // $userData = $stmt->fetch(PDO::FETCH_OBJ);
+        
         if (isset($userData->email)) {
             echo "Такой пользователь уже существует";
             return;
         }
-
-        $stmt = $this->db->prepare("INSERT INTO `users` (`email`, `password`, `username`) VALUES (?, ?, ?)");
-        $registrationOk = $stmt->execute([$email, $hash_password, $username]);
+        
+        $registrationOk = $this->db->insert(table:"users", columns:[
+            "email" => $email,
+            "password" => $hash_password,
+            "username" => $username
+        ]);
+        // $stmt = $this->db->prepare("INSERT INTO `users` (`email`, `password`, `username`) VALUES (?, ?, ?)");
+        // $registrationOk = $stmt->execute([$email, $hash_password, $username]);
 
         if ($registrationOk) {
-            $this->id = $this->db->lastInsertId();
+            $this->id = $this->db->getLastID();
             $this->email = $email;
             $this->password = $hash_password;
             $this->username = $username;
@@ -65,9 +73,11 @@ class User
             return;
         }
 
-        $stmt = $this->db->prepare("SELECT * FROM `users` WHERE email = ?");
-        $stmt->execute([$email]);
-        $userData = $stmt->fetch(PDO::FETCH_OBJ);
+        $userData = $this->db->getByCondition(table:"users", operator:"=", columns:["*"], where:["email" => $email])->getOneResult();
+
+        // $stmt = $this->db->prepare("SELECT * FROM `users` WHERE email = ?");
+        // $stmt->execute([$email]);
+        // $userData = $stmt->fetch(PDO::FETCH_OBJ);
 
         if (!isset($userData->email)) {
             echo "Пользователь не найден";
