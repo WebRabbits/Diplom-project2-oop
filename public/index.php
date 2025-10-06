@@ -11,18 +11,19 @@ use App\Models\Post;
 use App\Config\GetDataConfig;
 use App\Database\Connection;
 use App\Database\QueryBuilder;
+use App\Repositories\UserRepository;
 
-// $user1 = new User(new QueryBuilder(Connection::Connect()));
+$user1 = new User(new UserRepository(new QueryBuilder(Connection::Connect())));
 
 //// Регистрация пользователя
-// $user1->registration("newUser6@mail.com", "111", "New user Name 6"); 
+// $user1->registration("newUser9@mail.com", "111", "New user Name 9"); 
 // echo "Привет " . $user1->getUsername();
 // echo "Твой ID: " . $user1->getId();
 // echo "Твой email: " . $user1->getEmail();
 
 
 //// Авторизация пользователя
-// $user1->login("newUser6@mail.com", "111");
+// $user1->login("newUser9@mail.com", "111");
 // $_SESSION["email"] = $user1->getEmail();
 // $_SESSION["username"] = $user1->getUsername();
 // echo "Email: " . $_SESSION["email"] . "Имя: " . $_SESSION["username"];
@@ -44,9 +45,13 @@ use App\Database\QueryBuilder;
 // $result = $user1->getUsername();
 // echo $result;
 
+// $result = $user1->getFindEmail("newUser6@mail.com");
+// dd($result);
+
+
 //============================================================
 
-$post = new Post(new QueryBuilder(Connection::Connect()));
+// $post = new Post(new QueryBuilder(Connection::Connect()));
 
 //// Добавление нового поста
 // $post->addPost("Zagolobok 21", "tut tekst12321_21", $_FILES["image"]);
@@ -83,7 +88,7 @@ $post = new Post(new QueryBuilder(Connection::Connect()));
 // dd($res);
 
 //// Загрузка картинки
-$post->uploadImage($_FILES["image"], 39);
+// $post->uploadImage($_FILES["image"], 39);
 
 //// Удаление картинки
 // $post->deleteImage(89);

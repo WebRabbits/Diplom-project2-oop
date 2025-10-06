@@ -52,11 +52,6 @@ class Post
             "image_post" => $imagePost
         ]);
 
-        // $stmt = $this->db->prepare("INSERT INTO `posts` (title, description, image_post) VALUES (?, ?, ?)");
-        // $ok = $stmt->execute([$title, $description, $imagePost]);
-
-        // $this->id = $this->db->lastInsertId();
-
         if ($ok) {
             $this->id = $this->db->getLastID();
             $newPost = $this->getPostById($this->id);
@@ -101,9 +96,6 @@ class Post
             "image_post" => $imagePost
         ], where: ["id" => $id]);
 
-        // $stmt = $this->db->prepare("UPDATE `posts` SET `title` = ?, `description` = ?, `image_post` = ? WHERE `id` = ?");
-        // $stmt->execute([$title, $description, $imagePost, $id]);
-
         if ($result > 0) {
             echo "Пост успешно изменён";
             return true;
@@ -121,9 +113,6 @@ class Post
         $result = $this->db->delete(table: "posts", id: $id);
         $this->deleteImage(id: $id);
 
-        // $stmt = $this->db->prepare("DELETE FROM `posts` WHERE id = ?");
-        // $stmt->execute([$id]);
-
         if ($result > 0) {
             echo "Пост успешно удалён";
             return true;
@@ -135,9 +124,6 @@ class Post
     public function getAllPosts()
     {
         $this->result = $this->db->getAll(table: "posts")->result();
-        // $stmt = $this->db->prepare("SELECT * FROM `posts`");
-        // $stmt->execute();
-        // $this->result = $stmt->fetchAll(PDO::FETCH_OBJ);
         return $this;
     }
 
@@ -150,9 +136,6 @@ class Post
             return;
         }
 
-        // $stmt = $this->db->prepare("SELECT * FROM `posts` WHERE id = ?");
-        // $stmt->execute([$id]);
-        // $this->result = $stmt->fetch(PDO::FETCH_OBJ);
         return $this->result();
     }
     public function uploadImage(array $image)
