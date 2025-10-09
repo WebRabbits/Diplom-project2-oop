@@ -1,6 +1,4 @@
 <?php
-
-use LDAP\Result;
 session_start();
 
 require_once(__DIR__ . "/../vendor/autoload.php");
@@ -12,11 +10,13 @@ use App\Config\GetDataConfig;
 use App\Database\Connection;
 use App\Database\QueryBuilder;
 use App\Repositories\UserRepository;
+use App\Repositories\PostRepository;
+use Aura\SqlQuery\QueryFactory;
 
-$user1 = new User(new UserRepository(new QueryBuilder(Connection::Connect())));
+// $user1 = new User(new UserRepository(Connection::Connect(), new QueryFactory("mysql")));
 
 //// Регистрация пользователя
-// $user1->registration("newUser9@mail.com", "111", "New user Name 9"); 
+// $user1->registration("newUser14@mail.com", "111", "New user Name 144"); 
 // echo "Привет " . $user1->getUsername();
 // echo "Твой ID: " . $user1->getId();
 // echo "Твой email: " . $user1->getEmail();
@@ -51,40 +51,41 @@ $user1 = new User(new UserRepository(new QueryBuilder(Connection::Connect())));
 
 //============================================================
 
-// $post = new Post(new QueryBuilder(Connection::Connect()));
+$post = new Post(new PostRepository(Connection::Connect(), new QueryFactory("mysql")));
 
 //// Добавление нового поста
-// $post->addPost("Zagolobok 21", "tut tekst12321_21", $_FILES["image"]);
+// $post->addPost("tt112", " text1232", $_FILES["image"]);
 // echo $post->getId();
 // echo $post->getTitle();
 // echo $post->getDatePublished();
 // echo $post->getImagePost();
-// dd($res);
+
 
 // Получение объекта данных по конкретному посту при передачи ID-поста
-// $res = $post->getPostById(90);
+// $res = $post->getPostById(991);
 // dd($res);
 
 //// Изменение существующего поста
-// $result = $post->editPost(91, "12tdfgfgggWWWZZZWW1", "ZZZ", $_FILES["image"]);
+// $result = $post->editPost(101, "", "ppool", $_FILES["image"]);
 // echo $result;
 
 //// Удаление поста
-// $result = $post->deletePost(92);
+// $result = $post->deletePost( 104);
 // echo $result;
 
 //// Получение всех постов
-// $result = $post->getAllPosts()->result();
+// $result = $post->getAllPosts();
+// dd($result);
 // foreach ($result as $post) {
 //     var_dump($post->title);
 // }
 
 //// Помещение поста В архив
-// $res = $post->archive(91);
+// $res = $post->archive(97);
 // dd($res);
 
 //// Перемещение поста ИЗ архив
-// $res = $post->unarchive(91);
+// $res = $post->unarchive(97);
 // dd($res);
 
 //// Загрузка картинки

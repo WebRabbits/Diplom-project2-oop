@@ -2,11 +2,8 @@
 
 namespace App\Models;
 
-use App\Database\QueryBuilder;
-use DateTime;
+use App\Repositories\Interfaces\PostRepositoriesInterface;
 use PDO;
-
-require_once(__DIR__ . "/../config/dbconnect.php");
 
 class Post
 {
@@ -16,17 +13,18 @@ class Post
     private string $datePublished;
     private string $imagePost;
     private int $isActive;
-
-    private QueryBuilder $db;
+    private PostRepositoriesInterface $post;
     private $result = null;
 
-    public function __construct(QueryBuilder $pdo, string $title = "", string $description = "", string $imagePost = "", bool $isActive = true)
+    public function __construct(PostRepositoriesInterface $postRepo, string $title = "", string $description = "", string $date = "", string $imagePost = "", bool $isActive = true)
     {
         $this->title = $title;
         $this->description = $description;
+        $this->datePublished = $date;
         $this->imagePost = $imagePost;
         $this->isActive = $isActive;
-        $this->db = $pdo;
+        // $this->db = $pdo;
+        $this->post = $postRepo;
     }
 
     public function addPost(string $title, string $description, array $imagePost)
@@ -41,20 +39,16 @@ class Post
             return;
         }
 
-        $imagePost = $this->uploadImage($imagePost);
+        $imagePost = $this->post->uploadImage($imagePost);
         // dd($imagePost);
 
         if (is_null($imagePost)) return;
 
-        $ok = $this->db->insert(table: "posts", columns: [
-            "title" => $title,
-            "description" => $description,
-            "image_post" => $imagePost
-        ]);
+        $lastInsertID = $this->post->create($title, $description, $imagePost);
 
-        if ($ok) {
-            $this->id = $this->db->getLastID();
-            $newPost = $this->getPostById($this->id);
+        if ($lastInsertID) {
+            $this->id = $lastInsertID;
+            $newPost = $this->post->findById($this->id);
             $this->id = $newPost->id;
             $this->title = $newPost->title;
             $this->description = $newPost->description;
@@ -69,10 +63,11 @@ class Post
         echo "Ошибка. Не удалось добавить пост";
         return false;
     }
-
     public function editPost(int $id, string $title = "", string $description = "", array $imagePost = [])
     {
-        $currentPost = $this->getPostById($id);
+        $currentPost = $this->post->findById($id);
+        
+        
         if (!$currentPost) {
             return;
         }
@@ -83,18 +78,13 @@ class Post
         }
 
         if (!empty($imagePost)) {
-            $imagePost = $this->uploadImage($imagePost);
-            $this->deleteImage($id);
+            $imagePost = $this->post->uploadImage($imagePost);
+            $this->post->deleteImage($id);
         } else {
             $imagePost = $currentPost->image_post;
         }
 
-        $result = $this->db->update(table: "posts", operator: "=", bindValues: [
-            "id" => $id,
-            "title" => $title,
-            "description" => $description,
-            "image_post" => $imagePost
-        ], where: ["id" => $id]);
+        $result = $this->post->update($id, $title, $description, $imagePost);
 
         if ($result > 0) {
             echo "Пост успешно изменён";
@@ -106,13 +96,13 @@ class Post
     }
     public function deletePost(int $id)
     {
-        if (!$this->getPostById($id)) {
+        if (!$this->post->findById($id)) {
             return;
         }
-
-        $result = $this->db->delete(table: "posts", id: $id);
-        $this->deleteImage(id: $id);
-
+        
+        $this->post->deleteImage($id);
+        $result = $this->post->delete($id);
+        // die;
         if ($result > 0) {
             echo "Пост успешно удалён";
             return true;
@@ -123,98 +113,28 @@ class Post
     }
     public function getAllPosts()
     {
-        $this->result = $this->db->getAll(table: "posts")->result();
-        return $this;
+        return $this->post->getAll();
     }
 
     public function getPostById(int $id)
     {
-        $this->result = $this->db->getByCondition(table: "posts", operator: "=", columns: ["*"], where: ["id" => $id])->getOneResult();
+        $this->result = $this->post->findById($id);
 
-        if (is_null($this->result())) {
+        if (!$this->result()) {
             echo "Данный пост не существует";
             return;
         }
 
         return $this->result();
     }
-    public function uploadImage(array $image)
+    
+    public function archive(int $id)
     {
-        $arrayMIMEType = ["image/png", "image/jpeg"];
-        $nameFile = pathinfo($image["name"], PATHINFO_FILENAME);
-        $extensionFile = "." . pathinfo($image["name"], PATHINFO_EXTENSION);
-        $typeFile = $image["type"];
-        $tmpName = $image["tmp_name"];
-        $targetDirectory = dirname($_SERVER["DOCUMENT_ROOT"]) . "/img/posts/";
-        $targetFile = $targetDirectory . $nameFile . "_" . uniqid() . "_" . time() . $extensionFile;
-        $relativePathImage = "/img/posts/" . basename($targetFile);
-
-        if (!in_array($typeFile, $arrayMIMEType)) {
-            echo "Недоступный формат файла для загрузки";
+        if (!$this->post->findById($id)) {
             return;
         }
 
-        if (is_uploaded_file($tmpName)) {
-            if (!move_uploaded_file($tmpName, $targetFile)) {
-                echo "Произошла ошибка при загрузке файла на сервер";
-                return;
-            } else {
-                return $relativePathImage;
-            }
-        }
-    }
-
-    public function deleteImage(int $id)
-    {
-        if(!$this->getPostById($id)) {
-            return;
-        }
-
-        $this->result = $this->db->getByCondition(table: "posts", operator: "=", columns: ["image_post"], where: ["id" => $id])->getOneResult();
-
-        // $stmt = $this->db->prepare("SELECT `image_post` FROM `posts` WHERE id = ?");
-        // $stmt->execute([$id]);
-        // $this->result = $stmt->fetch(PDO::FETCH_OBJ);
-
-        $targetDirectory = dirname($_SERVER["DOCUMENT_ROOT"]);
-        $targetFile = $this->result()->image_post;
-
-        $file = $targetDirectory . $targetFile;
-
-        if (isset($this->result)) {
-            if (file_exists($file)) {
-                unlink($file);
-                return;
-            }
-
-            // if (!file_exists($file)) {
-            //     $stmt = $this->db->prepare("UPDATE `posts` SET `image_post` = ? WHERE id = ?");
-            //     $stmt->execute(["", $id]);
-            // }
-
-            // if ($stmt->rowCount() > 0) {
-            //     echo "Файл успешно удалён с сервера и БД";
-            //     return true;
-            // }
-        }
-
-        echo "Произошла непредвиденная ошибка при удалении файла";
-        return false;
-    }
-
-    public function archive(int $id, int $isActive = 0)
-    {
-        if (!$this->getPostById($id)) {
-            return;
-        }
-
-        $result = $this->db->update(table: "posts", operator: "=", bindValues: [
-            "id" => $id,
-            "is_active" => $isActive
-        ], where: ["id" => $id]);
-
-        // $stmt = $this->db->prepare("UPDATE `posts` SET `is_active` = ? WHERE `id` = ?");
-        // $stmt->execute([$isActive, $id]);
+        $result = $this->post->makeInactive($id);
 
         if ($result > 0) {
             echo "Пост помещён в архив";
@@ -225,19 +145,13 @@ class Post
         return false;
     }
 
-    public function unarchive(int $id, int $isActive = 1)
+    public function unarchive(int $id)
     {
-        if (!$this->getPostById($id)) {
+        if (!$this->post->findById($id)) {
             return;
         }
 
-        $result = $this->db->update(table:"posts", operator:"=", bindValues:[
-            "id" => $id,
-            "is_active" => $isActive
-        ], where:["id" => $id]);
-
-        // $stmt = $this->db->prepare("UPDATE `posts` SET `is_active` = ? WHERE `id` = ?");
-        // $stmt->execute([$isActive, $id]);
+        $result = $this->post->makeActive($id);
 
         if ($result > 0) {
             echo "Пост активен вновь";
@@ -248,7 +162,7 @@ class Post
         return false;
     }
 
-    // Геттеры
+    //// Геттеры
 
     public function getId()
     {

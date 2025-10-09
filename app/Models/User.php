@@ -1,11 +1,8 @@
 <?php
 
 namespace App\Models;
-use App\Database\QueryBuilder;
 use App\Repositories\Interfaces\UserRepositoriesInterface;
 use PDO;
-
-// require_once(__DIR__ . "/../config/dbconnect.php");
 
 class User
 {
@@ -13,12 +10,12 @@ class User
     private string $email;
     private string $password;
     private string $username;
-    private QueryBuilder $db;
     private UserRepositoriesInterface $user;
 
 
-    public function __construct(UserRepositoriesInterface $userRepo, $email = "", $password = "", $username = "")
+    public function __construct(UserRepositoriesInterface $userRepo, $id = null, $email = "", $password = "", $username = "")
     {
+        $this->id = $id;
         $this->email = $email;
         $this->password = $password;
         $this->username = $username;
@@ -35,17 +32,18 @@ class User
 
         $hash_password = password_hash($password, PASSWORD_DEFAULT);
 
-        $userData = $this->user->getFindEmailByUser($email);
-        
+        $userData = $this->user->findByEmail($email);
+
         if (isset($userData->email)) {
             echo "Такой пользователь уже существует";
             return;
         }
         
-        $registrationOk = $this->user->createUser($email, $hash_password, $username);
+        
+        $lastInsertID = $this->user->create($email, $hash_password, $username);
 
-        if ($registrationOk) {
-            $this->id = $this->user->getUserID();
+        if ($lastInsertID) {
+            $this->id = $lastInsertID;
             $this->email = $email;
             $this->password = $hash_password;
             $this->username = $username;
@@ -65,7 +63,7 @@ class User
             return;
         }
 
-        $userData = $this->user->getFindEmailByUser($email);
+        $userData = $this->user->findByEmail($email);
 
         if (!isset($userData->email)) {
             echo "Пользователь не найден";

@@ -3,32 +3,55 @@
 namespace App\Repositories;
 
 use App\Repositories\Interfaces\UserRepositoriesInterface;
-use App\Database\QueryBuilder;
+use Aura\SqlQuery\QueryFactory;
+use PDO;
+use App\Models\User;
 
 class UserRepository implements UserRepositoriesInterface
 {
-    private $db;
+    private PDO $pdo;
+    private QueryFactory $queryFactory;
 
-    public function __construct(QueryBuilder $pdo)
+    public function __construct(PDO $pdo, QueryFactory $queryFactory)
     {
-        $this->db = $pdo;
+        $this->pdo = $pdo;
+        $this->queryFactory = $queryFactory;
     }
 
-    public function getFindEmailByUser(string $email)
+    public function findByEmail(string $email)
     {
-        return $this->db->getByCondition(table: "users", operator: "=", columns: ["*"], where: ["email" => $email])->getOneResult();
+        $select = $this->queryFactory->newSelect();
+        $select->cols(["*"])->from("users")->where("email = :email", ["email" => $email]);
+        $stmt = $this->pdo->prepare($select->getStatement());
+        $stmt->execute($select->getBindValues());
+
+        $data = $stmt->fetch(PDO::FETCH_OBJ);
+        
+        return $data;
+        // return $data ? $this->createUserFromData($data) : null; // При добавлении DI контейнера - заменить на эту строку
     }
 
-    public function createUser(string $email, string $password, string $username)
-    {
-        return $this->db->insert(table: "users", columns: [
+    public function create(string $email, string $password, string $username)
+    {        
+        $insert = $this->queryFactory->newInsert();
+        $insert->into("users")->cols([
             "email" => $email,
             "password" => $password,
             "username" => $username
         ]);
+        $stmt = $this->pdo->prepare($insert->getStatement());
+        $stmt->execute($insert->getBindValues());
+
+        return $this->pdo->lastInsertId();      
     }
 
-    public function getUserID(){
-        return $this->db->getLastID();
-    }
+    // При добавлении DI контейнера - использовать данный метод, чтобы вернуть Объект класса User, а не stdClass
+    // public function createUserFromData($data){
+    //     return new User(
+    //         $data->id,
+    //         $data->email,
+    //         $data->password,
+    //         $data->username
+    //     );
+    // }
 }
