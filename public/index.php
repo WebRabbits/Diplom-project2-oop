@@ -1,17 +1,15 @@
 <?php
+
 session_start();
 
 require_once(__DIR__ . "/../vendor/autoload.php");
+require_once(__DIR__ . "/../app/containerBuilder/ContainerBuilder.php");
 // require_once(__DIR__ . "/../app/config/dbconnect.php");
 
 use App\Models\User;
 use App\Models\Post;
-use App\Config\GetDataConfig;
-use App\Database\Connection;
-use App\Database\QueryBuilder;
-use App\Repositories\UserRepository;
-use App\Repositories\PostRepository;
-use Aura\SqlQuery\QueryFactory;
+
+
 
 // $user1 = new User(new UserRepository(Connection::Connect(), new QueryFactory("mysql")));
 
@@ -51,7 +49,7 @@ use Aura\SqlQuery\QueryFactory;
 
 //============================================================
 
-$post = new Post(new PostRepository(Connection::Connect(), new QueryFactory("mysql")));
+// $post = new Post(new PostRepository(Connection::Connect(), new QueryFactory("mysql")));
 
 //// Добавление нового поста
 // $post->addPost("tt112", " text1232", $_FILES["image"]);
@@ -124,10 +122,55 @@ $post = new Post(new PostRepository(Connection::Connect(), new QueryFactory("mys
 // $db->delete("posts", 72); // Удаление данных из таблицы по преданному идентификатору записи в БД
 
 
+//// Реализация роутинга на проекте с использованием DI-контейнера
+$dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
+    $r->addRoute('GET', '/registration', ["App\Controllers\RegistrationController", "showRegistration"]);
+    // {id} must be a number (\d+)
+    // $r->addRoute('GET', '/user/{id:\d+}', 'get_user_handler');
+    // // The /{title} suffix is optional
+    // $r->addRoute('GET', '/articles/{id:\d+}[/{title}[/{title2}]]', 'get_article_handler');
+});
+
+// Fetch method and URI from somewhere
+$httpMethod = $_SERVER['REQUEST_METHOD'];
+$uri = $_SERVER['REQUEST_URI'];
+
+// Strip query string (?foo=bar) and decode URI
+if (false !== $pos = strpos($uri, '?')) {
+    $uri = substr($uri, 0, $pos);
+}
+$uri = rawurldecode($uri);
+
+$routeInfo = $dispatcher->dispatch($httpMethod, $uri);
+switch ($routeInfo[0]) {
+    case FastRoute\Dispatcher::NOT_FOUND:
+        // ... 404 Not Found
+        echo "Page 404";
+        break;
+    case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+        $allowedMethods = $routeInfo[1];
+        // ... 405 Method Not Allowed
+        echo "405 Method Not Allowed";
+        break;
+    case FastRoute\Dispatcher::FOUND:
+        $handler = $routeInfo[1];
+        $vars = $routeInfo[2];
+        // dd($handler);
+        // dd($vars);
+        // dd($handler);
+
+        $container->call($handler, $vars);
+
+        // ... call $handler with $vars
+        // $controller = new $handler[0];
+        // call_user_func([$controller, $handler[1]], $vars);
+        break;
+}
+
 ?>
 
-<form action="" method="post" enctype="multipart/form-data">
+<!-- <form action="" method="post" enctype="multipart/form-data">
     <label for="image">Загрузите картинку</label>
     <input type="file" name="image"><br>
     <button type="submit">Отправить</button>
-</form>
+</form> -->
