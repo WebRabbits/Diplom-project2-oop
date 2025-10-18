@@ -8,6 +8,7 @@ require_once(__DIR__ . "/../app/containerBuilder/ContainerBuilder.php");
 
 use App\Models\User;
 use App\Models\Post;
+use App\Services\ValidationService;
 
 
 
@@ -123,8 +124,13 @@ use App\Models\Post;
 
 
 //// Реализация роутинга на проекте с использованием DI-контейнера
-$dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-    $r->addRoute('GET', '/registration', ["App\Controllers\RegistrationController", "showRegistration"]);
+$dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
+    $r->addRoute("GET", "/registration", ["App\Controllers\RegistrationController", "showRegistration"]);
+    $r->addRoute("POST", "/registration", ["App\Controllers\RegistrationController", "registration"]);
+    $r->addRoute("GET", "/auth", ["App\Controllers\AuthController", "showAuth"]);
+    $r->addRoute("POST", "/auth", ["App\Controllers\AuthController", "auth"]);
+    $r->addRoute("GET", "/logout", ["App\Controllers\AuthController", "logout"]);
+    $r->addRoute("GET", "/profile", ["App\Controllers\ProfileController", "showProfile"]);
     // {id} must be a number (\d+)
     // $r->addRoute('GET', '/user/{id:\d+}', 'get_user_handler');
     // // The /{title} suffix is optional
@@ -166,6 +172,17 @@ switch ($routeInfo[0]) {
         // call_user_func([$controller, $handler[1]], $vars);
         break;
 }
+
+
+// $validate = new ValidationService();
+// $validate->validate([
+//     "email" => "",
+//     "password" => "11",
+//     "username" => ""
+// ]);
+
+// $validate->addErrorException("Данные заполнены неверно!");
+// dd($validate->errors());
 
 ?>
 

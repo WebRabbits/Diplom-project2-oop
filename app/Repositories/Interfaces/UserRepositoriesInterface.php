@@ -6,7 +6,7 @@ interface UserRepositoriesInterface{
     public function findByEmail(string $email);
     public function create(string $email, string $password, string $username);
 
-    // public function createUserFromData(object $data);
+    public function createUserFromData(object $data);
 }
 
 
