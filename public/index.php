@@ -131,6 +131,11 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     $r->addRoute("POST", "/auth", ["App\Controllers\AuthController", "auth"]);
     $r->addRoute("GET", "/logout", ["App\Controllers\AuthController", "logout"]);
     $r->addRoute("GET", "/profile", ["App\Controllers\ProfileController", "showProfile"]);
+    $r->addRoute("GET", "/posts", ["App\Controllers\ViewAllPosts", "showAllPosts"]);
+    $r->addRoute("GET", "/posts/add", ["App\Controllers\AddPostController", "show"]);
+    $r->addRoute("POST", "/posts/add", ["App\Controllers\AddPostController", "addNewPost"]);
+    $r->addRoute("GET", "/posts/edit/{id:\d+}", ["App\Controllers\EditPostController", "show"]);
+    $r->addRoute("POST", "/posts/edit/{id:\d+}", ["App\Controllers\EditPostController", "update"]);
     // {id} must be a number (\d+)
     // $r->addRoute('GET', '/user/{id:\d+}', 'get_user_handler');
     // // The /{title} suffix is optional
@@ -165,7 +170,7 @@ switch ($routeInfo[0]) {
         // dd($vars);
         // dd($handler);
 
-        $container->call($handler, $vars);
+        $container->call($handler, [$vars]);
 
         // ... call $handler with $vars
         // $controller = new $handler[0];

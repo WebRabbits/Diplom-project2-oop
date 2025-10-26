@@ -36,7 +36,7 @@ class RegistrationController
                 "username" => $username
             ];
 
-            $this->validationResult = $this->validationData->validate($data);
+            $this->validationResult = $this->validationData->validate($data, "registration");
             if (!$this->validationResult->passed()) {
                 // echo "Данные неверны!";
                 $this->validationResult->addErrorException("Данные заполнены некорректно");

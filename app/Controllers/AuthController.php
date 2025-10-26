@@ -37,7 +37,7 @@ class AuthController
             "password" => $password ?? ""
         ];
 
-        $this->validationResult = $this->validationData->validate($data);
+        $this->validationResult = $this->validationData->validate($data, "auth");
 
         if (!$this->validationResult->passed()) {
             $this->validationData->addErrorException("Данные введены некорректно!");
@@ -73,7 +73,7 @@ class AuthController
                 session_regenerate_id(true);
 
                 $_SESSION["user"] = [
-                    "id" => $user->getId(),
+                    "idUser" => $user->getId(),
                     "email" => $user->getEmail(),
                     "username" => $user->getUsername()
                 ];

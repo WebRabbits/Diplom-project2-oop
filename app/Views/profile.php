@@ -6,6 +6,7 @@
         <ul>
             <li><a href="/registration">Регистрация</a></li>
             <li><a href="/auth">Авторизация</a></li>
+            <li><a href="/posts">Список всех постов</a></li>
             <li><a href="/logout">Выход</a></li>
         </ul>
     </div>
@@ -15,7 +16,7 @@
     </div>
     <div class="box">
         <p>Ваши данные:</p>
-        <span>Ваш ID в системе: <?= $_SESSION["user"]["id"]?></span><br>
+        <span>Ваш ID в системе: <?= $_SESSION["user"]["idUser"]?></span><br>
         <span>Email-адрес: <?= $_SESSION["user"]["email"]?></span><br>
         <span>Имя пользователя: <?= $_SESSION["user"]["username"]?></span><br>
     </div>

@@ -4,8 +4,8 @@ namespace App\Repositories\Interfaces;
 
 interface PostRepositoriesInterface
 {
-    public function create(string $title, string $description, string $image);
-    public function update(int $id, string $title, string $description, string $image);
+    public function create(int $idCreator, string $title, string $description, array $image);
+    public function update(int $id, int $idCreator, string $title, string $description, array $image);
     public function delete(int $id);
     public function getAll();
     public function findById(int $id);
@@ -13,5 +13,5 @@ interface PostRepositoriesInterface
     public function makeActive(int $id);
     public function uploadImage(array $image);
     public function deleteImage(int $idPost);
-    // public function createPostFromData(object $data);
+    public function createPostFromData(object $data);
 }
