@@ -5,6 +5,7 @@ namespace App\ContainerBuilder;
 use DI\ContainerBuilder;
 use App\Database\Connection;
 use Aura\SqlQuery\QueryFactory;
+use League\Plates\Engine;
 use App\Services\ValidationService;
 use App\Services\PasswordHasher;
 use PDO;
@@ -26,6 +27,10 @@ $builder->addDefinitions([
 
     PasswordHasher::class => function () {
         return new PasswordHasher();
+    },
+
+    Engine::class => function() {
+        return new Engine("../app/Views");
     }
 ]);
 

@@ -80,7 +80,7 @@ class User
 
     public function changeUsername(string $username): void {
         if(strlen($username) < 2) {
-            throw new \InvalidArgumentException("USername must be at least 2 characters long");
+            throw new \InvalidArgumentException("Username must be at least 2 characters long");
         }
 
         $this->username = trim($username);

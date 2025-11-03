@@ -1,0 +1,6 @@
+.add-hidden-text-content{
+    max-width: 230px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

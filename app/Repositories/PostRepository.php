@@ -7,6 +7,8 @@ use Aura\SqlQuery\QueryFactory;
 use PDO;
 use App\Models\Post;
 
+use function PHPSTORM_META\type;
+
 class PostRepository implements PostRepositoriesInterface
 {
     private PDO $pdo;
@@ -68,6 +70,7 @@ class PostRepository implements PostRepositoriesInterface
 
     public function delete(int $id)
     {
+        $this->deleteImage($id);
         $delete = $this->queryFactory->newDelete();
         $delete->from("posts")->where("id = :id", ["id" => $id])->bindValue("id", $id);
         $stmt = $this->pdo->prepare($delete->getStatement());
@@ -107,6 +110,25 @@ class PostRepository implements PostRepositoriesInterface
 
         $data = $stmt->fetch(PDO::FETCH_OBJ);
         return $data ? $this->createPostFromData($data) : null; // При добавлении DI контейнера - заменить на эту строку
+    }
+
+    public function findPostsByCreator(int $idCreator) {
+        $select = $this->queryFactory->newSelect();
+        $select->cols(["*"])->from("posts")->where("id_creator = :id_creator", ["id_creator" => $idCreator])->orderBy(["date DESC"]);
+        $stmt = $this->pdo->prepare($select->getStatement());
+        $stmt->execute($select->getBindValues());
+
+        $data = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        if(empty($data)) {
+            return [];
+        }
+        
+        foreach($data as $post) {
+            $posts[] = $this->createPostFromData($post);
+        }
+
+        return is_array($posts) ? $posts : false;
     }
     public function makeInactive(int $id)
     {

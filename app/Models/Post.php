@@ -91,7 +91,7 @@ class Post
 
     public function isActivate(){
         if($this->isActive == self::STATUS_ACTIVATE) {
-            throw new \InvalidArgumentException("Cannot be activated. Pst is already active");
+            throw new \InvalidArgumentException("Cannot be activated. Post is already active");
         }
 
         $this->isActive = self::STATUS_ACTIVATE;

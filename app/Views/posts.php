@@ -1,45 +1,72 @@
 <?php
-$posts = $posts ?? [];
-// dd($posts);
+$this->layout("layout", [
+    "title" => "Каталог постов"
+]);
 ?>
-
-<div class="container" style=" display: flex; flex-direction: column;">
-    <div class="box">
-        <p>Страница всех постов</p>
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-center text-dark mb-3">Все посты пользователей</h1>
+            <p class="text-center text-muted">Общее количество постов: <?= count($allPosts) ?></p>
+        </div>
     </div>
-    <div class="box" style=" display: flex; flex-direction: column; align-items: flex-start;">
-        <a href="/posts/add">Добавить пост</a>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        <?php if (!empty($allPosts)): ?>
+            <?php foreach ($allPosts as $post): ?>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark mb-3"><?= $post->getTitle()?></h5>
+                            <div class="mb-3">
+                                <img src="<?= $post->getImagePost()?>"
+                                    alt="Изображение поста"
+                                    class="img-fluid rounded w-100"
+                                    style="height: 200px; object-fit: contain;">
+                            </div>
+                            <p class="card-text text-muted mb-3 add-hidden-text-content">
+                                <?= $post->getDescription()?>
+                            </p>
+                            <div class="border-start border-primary border-3 ps-2 mb-2">
+                                <small class="text-muted">Создатель:</small>                                    
+                                <div class="text-dark fw-semibold"><?= isset($creatorData) ? $creatorData[$post->getIdCreator()] : "Неизвестный"?></div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Изменён: <?= $post->getDatePublished()?></small>
+                                <?php if($post->getIsActive()):?>
+                                    <span class="badge bg-success">Активен</span>
+                                <?php else:?>    
+                                    <span class="badge bg-dark">Архивирован</span>
+                                <?php endif;?>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-top">
+                            <div class="d-grid">
+                                <a href="/posts/view/<?= $post->getId()?>" class="btn btn-outline-primary btn-sm">Читать полностью</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 
-    <?php if (isset($posts)): ?>
-        <?php foreach ($posts as $post): ?>
-            <div class="box" style=" display: flex; flex-direction: column; align-items: flex-start; border: 1px solid purple; padding: 5px; margin-bottom: 10px;">
-                <p><?= $post->getTitle()?></p>
-                <span><?= $post->getDescription()?></span>
-                <span>Дата: <?= $post->getDatePublished()?></span>
-                <span>Картинка поста:</span>
-                <img src="<?= $post->getImagePost()?>" alt="" style="width: 50px; height: 50px;">
-                <span><?= $post->getIsActive() == 1 ? "Активный" : "Не активный"?></span>
-                <a href="/posts/edit/<?= $post->getId()?>">Редактировать пост</a>
-            </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
-
-
-
-
-
-
-    <!-- <div class="box" style=" display: flex; flex-direction: column; align-items: flex-start;">
-        <p>Заголовок №1</p>
-        <span>Описание №1</span>
-        <span>Дата: 2025-10-20 15:41:48</span>
-        <span>Картинка поста:</span>
-        <img src="image_3_68e83c68b04d1_1760050280.jpg" alt="">
-        <button type="submit">Добавить пост</button>
-        <button type="submit">Редактировать пост</button>
-        <button type="submit">Удалить пост</button>
-        <button type="submit">Сделать пост НЕактивным</button>
-        <button type="submit">Сделать пост Активным</button>
+    <!-- Пагинация -->
+    <!-- <div class="row mt-5">
+        <div class="col-12">
+            <nav aria-label="Навигация по страницам">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Назад</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Вперед</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div> -->
 </div>

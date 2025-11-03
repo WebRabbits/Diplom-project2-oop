@@ -20,6 +20,7 @@ class ComposerStaticInit8d070178755c320c69f93ee4800660ef
         ),
         'L' => 
         array (
+            'League\\Plates\\' => 14,
             'Laravel\\SerializableClosure\\' => 28,
         ),
         'K' => 
@@ -49,6 +50,10 @@ class ComposerStaticInit8d070178755c320c69f93ee4800660ef
         'Psr\\Container\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
+        ),
+        'League\\Plates\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/plates/src',
         ),
         'Laravel\\SerializableClosure\\' => 
         array (

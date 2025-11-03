@@ -125,17 +125,19 @@ use App\Services\ValidationService;
 
 //// Реализация роутинга на проекте с использованием DI-контейнера
 $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
+    $r->addRoute("GET", "/", ["App\Controllers\ViewAllPosts", "showAllPosts"]);
     $r->addRoute("GET", "/registration", ["App\Controllers\RegistrationController", "showRegistration"]);
     $r->addRoute("POST", "/registration", ["App\Controllers\RegistrationController", "registration"]);
     $r->addRoute("GET", "/auth", ["App\Controllers\AuthController", "showAuth"]);
     $r->addRoute("POST", "/auth", ["App\Controllers\AuthController", "auth"]);
     $r->addRoute("GET", "/logout", ["App\Controllers\AuthController", "logout"]);
-    $r->addRoute("GET", "/profile", ["App\Controllers\ProfileController", "showProfile"]);
-    $r->addRoute("GET", "/posts", ["App\Controllers\ViewAllPosts", "showAllPosts"]);
+    $r->addRoute("GET", "/profile/{id:\d+}", ["App\Controllers\ProfileController", "showProfile"]);
+    $r->addRoute("GET", "/posts/view/{id:\d+}", ["App\Controllers\ViewPost", "viewPost"]);
     $r->addRoute("GET", "/posts/add", ["App\Controllers\AddPostController", "show"]);
     $r->addRoute("POST", "/posts/add", ["App\Controllers\AddPostController", "addNewPost"]);
     $r->addRoute("GET", "/posts/edit/{id:\d+}", ["App\Controllers\EditPostController", "show"]);
     $r->addRoute("POST", "/posts/edit/{id:\d+}", ["App\Controllers\EditPostController", "update"]);
+    $r->addRoute("POST", "/posts/actions", ["App\Controllers\UserActionPostController", "handleActions"]);
     // {id} must be a number (\d+)
     // $r->addRoute('GET', '/user/{id:\d+}', 'get_user_handler');
     // // The /{title} suffix is optional

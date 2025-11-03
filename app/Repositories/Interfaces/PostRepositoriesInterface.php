@@ -9,6 +9,7 @@ interface PostRepositoriesInterface
     public function delete(int $id);
     public function getAll();
     public function findById(int $id);
+    public function findPostsByCreator(int $idCreator);
     public function makeInactive(int $id);
     public function makeActive(int $id);
     public function uploadImage(array $image);

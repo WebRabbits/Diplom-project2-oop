@@ -5,24 +5,28 @@ namespace App\Controllers;
 use App\Repositories\UserRepository;
 use App\Services\ValidationService;
 use App\Services\PasswordHasher;
+use League\Plates\Engine;
 
 class AuthController
 {
     private UserRepository $userRepo;
     private ValidationService $validationData;
     private PasswordHasher $hasher;
+    private Engine $template;
     private $validationResult;
 
-    public function __construct(UserRepository $userRepo, ValidationService $validate, PasswordHasher $hasher)
+    public function __construct(UserRepository $userRepo, ValidationService $validate, PasswordHasher $hasher, Engine $engine)
     {
         $this->userRepo = $userRepo;
         $this->validationData = $validate;
         $this->hasher = $hasher;
+        $this->template = $engine;
     }
 
     public function showAuth()
     {
-        include(__DIR__ . "/../Views/auth.php");
+        echo $this->template->render("auth");
+        // include(__DIR__ . "/../Views/auth.php");
     }
 
     public function auth()
@@ -42,7 +46,8 @@ class AuthController
         if (!$this->validationResult->passed()) {
             $this->validationData->addErrorException("Данные введены некорректно!");
             $errors = $this->validationResult->errors();
-            include(__DIR__ . "/../Views/auth.php");
+            echo $this->template->render("auth", ["errors" => $errors]);
+            // include(__DIR__ . "/../Views/auth.php");
             return;
         }
 
@@ -53,7 +58,8 @@ class AuthController
             if (!$user) {
                 $this->validationData->addErrorException("Пользователя с данным Email не существует!");
                 $errors = $this->validationResult->errors();
-                include(__DIR__ . "/../Views/auth.php");
+                // include(__DIR__ . "/../Views/auth.php");
+                echo $this->template->render("auth", ["errors" => $errors]);
                 return;
             } else {
                 $isValidPassword = $this->hasher->passwordVerify($password, $user->getPassword())->getPasswordHashCheck();
@@ -62,7 +68,8 @@ class AuthController
                 if (!$isValidPassword) {
                     $this->validationData->addErrorException("Неверно указан пароль!");
                     $errors = $this->validationResult->errors();
-                    include(__DIR__ . "/../Views/auth.php");
+                    echo $this->template->render("auth", ["errors" => $errors]);
+                    // include(__DIR__ . "/../Views/auth.php");
                     return;
                 }
             }
@@ -78,7 +85,7 @@ class AuthController
                     "username" => $user->getUsername()
                 ];
 
-                header("Location: /profile");
+                header("Location: /profile/".$user->getId());
                 exit();
             }
         }

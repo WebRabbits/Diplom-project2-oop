@@ -35,7 +35,7 @@ class AddPostController{
             "image_post" => $imagePost ?? "",
         ];
 
-        $this->validationResult = $this->validationData->validate($data, "validatePost");
+        $this->validationResult = $this->validationData->validate($data, "validateCreatePost");
         if(!$this->validationResult->passed()){
             $errors = $this->validationData->errors();
             include(__DIR__ . "/../Views/add.php");

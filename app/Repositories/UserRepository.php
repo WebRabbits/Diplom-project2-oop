@@ -31,6 +31,17 @@ class UserRepository implements UserRepositoriesInterface
         return $data ? $this->createUserFromData($data) : false; // При добавлении DI контейнера - заменить на эту строку
     }
 
+    public function findById(int $id){
+        $select = $this->queryFactory->newSelect();
+        $select->cols(["*"])->from("users")->where("id = :id", ["id" => $id]);
+        $stmt = $this->pdo->prepare($select->getStatement());
+        $stmt->execute($select->getBindValues());
+
+        $data = $stmt->fetch(PDO::FETCH_OBJ);
+
+        return $data ? $this->createUserFromData($data) : false;
+    }
+
     public function create(string $email, string $password, string $username): bool|User
     {        
         // $password = password_hash($password, PASSWORD_DEFAULT);
