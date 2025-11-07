@@ -57,16 +57,16 @@ class ValidationService{
     }
 
     public function validateCreatePost($data) {
-        $this->field("title", $data["title"] ?? "")->required()->minLength(7)->maxLength(150);
+        $this->field("title", $data["title"] ?? "")->required()->minLength(10)->maxLength(100);
 
-        $this->field("description", $data["description"] ?? "")->required()->minLength(10)->maxLength(1000);
+        $this->field("description", $data["description"] ?? "")->required()->minLength(10)->maxLength(100000);
 
         $this->field("image_post", $data["image_post"] ?? [])->requiredImage()->typeImage();
     }
 
     public function validateEditPost($data) {
-        $this->field("title", $data["title"] ?? "")->minLength(7)->maxLength(150);
-        $this->field("description", $data["description"] ?? "")->minLength(10)->maxLength(1000);
+        $this->field("title", $data["title"] ?? "")->minLength(10)->maxLength(100);
+        $this->field("description", $data["description"] ?? "")->minLength(10)->maxLength(100000);
         $this->field("image_post", $data["image_post"] ?? []) == empty($this->currentValue["type"]) ? $this->isEmptyImage() : $this->typeImage();
     }
 

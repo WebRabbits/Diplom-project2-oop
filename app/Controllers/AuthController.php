@@ -25,52 +25,54 @@ class AuthController
 
     public function showAuth()
     {
-        echo $this->template->render("auth");
-        // include(__DIR__ . "/../Views/auth.php");
+        $errors = $_SESSION["errors"] ?? [];
+        $old = $_SESSION["old"] ?? [];
+        unset($_SESSION["errors"], $_SESSION["old"]);
+
+        echo $this->template->render("auth", compact("errors", "old"));
     }
 
     public function auth()
     {
-        if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $email = trim($_POST["email"]);
-            $password = trim($_POST["password"]);
+        if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+            header("Location: /auth");
+            exit();
         }
 
         $data = [
-            "email" => $email ?? "",
-            "password" => $password ?? ""
+            "email" => trim($_POST["email"]) ?? "",
+            "password" => trim($_POST["password"]) ?? ""
         ];
 
         $this->validationResult = $this->validationData->validate($data, "auth");
 
         if (!$this->validationResult->passed()) {
             $this->validationData->addErrorException("Данные введены некорректно!");
-            $errors = $this->validationResult->errors();
-            echo $this->template->render("auth", ["errors" => $errors]);
-            // include(__DIR__ . "/../Views/auth.php");
-            return;
+            $_SESSION["errors"] = $this->validationResult->errors();
+            $_SESSION["old"] = $data;
+            header("Location: /auth");
+            exit();
         }
 
         if ($this->validationResult->passed()) {
-            $user = $this->userRepo->findByEmail($email);
-            // dd($user);
+            $user = $this->userRepo->findByEmail($data["email"]);
 
             if (!$user) {
                 $this->validationData->addErrorException("Пользователя с данным Email не существует!");
-                $errors = $this->validationResult->errors();
-                // include(__DIR__ . "/../Views/auth.php");
-                echo $this->template->render("auth", ["errors" => $errors]);
-                return;
+                $_SESSION["errors"] = $this->validationResult->errors();
+                $_SESSION["old"] = $data;
+                header("Location: /auth");
+                exit();
+
             } else {
-                $isValidPassword = $this->hasher->passwordVerify($password, $user->getPassword())->getPasswordHashCheck();
-                // dd($isValidPassword);
+                $isValidPassword = $this->hasher->passwordVerify($data["password"], $user->getPassword())->getPasswordHashCheck();
 
                 if (!$isValidPassword) {
                     $this->validationData->addErrorException("Неверно указан пароль!");
-                    $errors = $this->validationResult->errors();
-                    echo $this->template->render("auth", ["errors" => $errors]);
-                    // include(__DIR__ . "/../Views/auth.php");
-                    return;
+                    $_SESSION["errors"] = $this->validationResult->errors();
+                    $_SESSION["old"] = $data;
+                    header("Location: /auth");
+                    exit();
                 }
             }
 
@@ -100,5 +102,6 @@ class AuthController
         session_destroy();
 
         header("Location: /auth");
+        exit();
     }
 }

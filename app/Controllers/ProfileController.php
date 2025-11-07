@@ -20,17 +20,13 @@ class ProfileController{
 
     public function showProfile(array $vars){
         $idUser = $vars["id"];
-        // dd($idUser);
         $user = $this->userRepo->findById($idUser);
-        // dd($user);
         $allPostThisUser = $this->postRepo->findPostsByCreator($idUser);
-        // dd($allPostThisUser);
 
         echo $this->template->render("profile", [
             "posts" => $allPostThisUser,
             "user" => $user
         ]);
-        // include(__DIR__ . "/../Views/profile.php");
     }
 
 }

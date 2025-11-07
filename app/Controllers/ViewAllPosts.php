@@ -28,7 +28,9 @@ class ViewAllPosts{
             $creatorData[$user->getId()] = $user->getUsername();
         }
         echo $this->template->render("posts", [
-            "allPosts" => $posts,
+            "allPosts" => array_filter($posts, function($post) {
+                return $post->getIsActive();
+            }),
             "creatorData" => $creatorData
         ]);
     }

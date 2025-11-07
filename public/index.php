@@ -137,7 +137,10 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     $r->addRoute("POST", "/posts/add", ["App\Controllers\AddPostController", "addNewPost"]);
     $r->addRoute("GET", "/posts/edit/{id:\d+}", ["App\Controllers\EditPostController", "show"]);
     $r->addRoute("POST", "/posts/edit/{id:\d+}", ["App\Controllers\EditPostController", "update"]);
-    $r->addRoute("POST", "/posts/actions", ["App\Controllers\UserActionPostController", "handleActions"]);
+    // $r->addRoute("POST", "/posts/actions", ["App\Controllers\UserActionPostController", "handleActions"]);
+    $r->addRoute("GET", "/posts/delete/{id:\d+}", ["App\Controllers\UserActionPostController", "delete"]);
+    $r->addRoute("GET", "/posts/active/{id:\d+}", ["App\Controllers\UserActionPostController", "active"]);
+    $r->addRoute("GET", "/posts/inactive/{id:\d+}", ["App\Controllers\UserActionPostController", "inactive"]);
     // {id} must be a number (\d+)
     // $r->addRoute('GET', '/user/{id:\d+}', 'get_user_handler');
     // // The /{title} suffix is optional

@@ -39,12 +39,12 @@ $hasErrors = !empty($errors);
         <form id="js-login" action="" method="post" novalidate="" class="<?= $hasErrors ? "was-validated" : ""?>">
             <div class="form-group">
                 <label class="form-label" for="username">Email</label>
-                <input type="email" id="username" name="email" placeholder="Эл. адрес" class="form-control <?= !empty($getError("email")) ? "is-invalid" : "" ?>" value="<?= $_POST["email"] ?? ""?>">
+                <input type="email" id="username" name="email" placeholder="Эл. адрес" class="form-control <?= !empty($getError("email")) ? "is-invalid" : "" ?>" value="<?= $old["email"] ?? ""?>">
                 <div class="invalid-feedback"><?= $getError("email")?></div>
             </div>
             <div class="form-group">
                 <label class="form-label" for="password">Пароль</label>
-                <input type="password" id="password" name="password" class="form-control <?= !empty($getError("password")) ? "is-invalid" : "" ?>" value="<?= $_POST["password"] ?? ""?>">
+                <input type="password" id="password" name="password" class="form-control <?= !empty($getError("password")) ? "is-invalid" : "" ?>" value="<?= $old["password"] ?? ""?>">
                 <div class="invalid-feedback"><?= $getError("password")?></div>
             </div>
             <button type="submit" id="js-login-btn" class="btn btn-default float-right">Войти</button>

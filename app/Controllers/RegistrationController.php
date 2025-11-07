@@ -23,52 +23,49 @@ class RegistrationController
 
     public function showRegistration()
     {
-        // include(__DIR__ . "/../Views/registration.php");
-        echo $this->template->render("registration");
+        $errors = $_SESSION["errors"] ?? [];
+        $old = $_SESSION["old"] ?? [];
+        unset($_SESSION["errors"], $_SESSION["old"]);
+        
+        echo $this->template->render("registration", compact("errors", "old"));
     }
 
     public function registration()
     {
-        if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $email = trim($_POST["email"]) ?? "";
-            $password = trim($_POST["password"]) ?? "";
-            $username = trim(htmlspecialchars($_POST["username"])) ?? "";
+        if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+            header("Location: /registration");
+            exit();
+        }
 
             $data = [
-                "email" => $email,
-                "password" => $password,
-                "username" => $username
+                "email" => trim($_POST["email"]) ?? "",
+                "password" => trim($_POST["password"]) ?? "",
+                "username" => trim(htmlspecialchars($_POST["username"])) ?? ""
             ];
 
             $this->validationResult = $this->validationData->validate($data, "registration");
             if (!$this->validationResult->passed()) {
-                // echo "Данные неверны!";
                 $this->validationResult->addErrorException("Данные заполнены некорректно");
-                $errors = $this->validationResult->errors();
-                // dd($errors);
-                // die;
-                echo $this->template->render("registration", ["errors" => $errors]);
-                return;
-                // include(__DIR__ . "/../Views/registration.php");
-                // return;
+                $_SESSION["errors"] = $this->validationResult->errors();
+                $_SESSION["old"] = $data;
+                header("Location: /registration");
+                exit();
             }
 
             if ($this->validationResult->passed()) {
-                $existingEmail = $this->userRepo->findByEmail($email);
-                if (!$existingEmail) {
-                    $user = $this->userRepo->create($email, $password, $username);
-                    $_SESSION["reg_complete"] = "Вы успешно зарегистрировались";
-                    header("Location: /auth");
-                    exit();
-                    // dd($user);
-                    // die;
-                } else {
+                if($this->userRepo->findByEmail($data["email"])) {
                     $this->validationData->addErrorException("Такой пользователь уже существует");
-                    $errors = $this->validationResult->errors();
-                    echo $this->template->render("registration", ["errors" => $errors]);
-                    return;
+                    $_SESSION["errors"] = $this->validationResult->errors();
+                    $_SESSION["old"] = $data;
+                    header("Location: /registration");
+                    exit();
                 }
+
+                $user = $this->userRepo->create($data["email"], $data["password"], $data["username"]);
+                $_SESSION["reg_complete"] = "Вы успешно зарегистрировались";
+                header("Location: /auth");
+                exit();
             }
-        }
+        
     }
 }

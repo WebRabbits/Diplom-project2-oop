@@ -4,76 +4,82 @@ namespace App\Controllers;
 
 use App\Repositories\PostRepository;
 use App\Services\ValidationService;
+use League\Plates\Engine;
 
 class EditPostController
 {
     private PostRepository $postRepo;
     private ValidationService $validationData;
+    private Engine $engine;
     private $validationResult;
+    private $template;
 
-    public function __construct(PostRepository $postRepo, ValidationService $validate)
+    public function __construct(PostRepository $postRepo, ValidationService $validate, Engine $engine)
     {
         $this->postRepo = $postRepo;
         $this->validationData = $validate;
+        $this->template = $engine;
     }
 
     public function show(array $vars)
     {
-        $postId = (int) $vars["id"];
+        $path = $_SERVER["REQUEST_URI"];
+        // $postId = (int) $vars["id"];
+        $post = $this->postRepo->findById((int) $vars["id"]);
+        $errors = $_SESSION["errors"] ?? [];
+        $old = $_SESSION["old"] ?? [];
+        unset($_SESSION["errors"], $_SESSION["old"]);
 
-        $post = $this->postRepo->findById($postId);
-        // dd($post);
-        include(__DIR__ . "/../Views/edit.php");
+        echo $this->template->render("edit", compact("errors", "old", "post"));
     }
 
     public function update(array $vars)
     {
         $idPost = $vars["id"];
         $currentUserId = $_SESSION["user"]["idUser"];
+        $path = $_SERVER["REQUEST_URI"];
 
         $post = $this->postRepo->findById($idPost);
-        // dd($post);
 
-        if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $title = trim(htmlspecialchars($_POST["title"]));
-            $description = trim(htmlspecialchars($_POST["description"]));
-            $imagePost = $_FILES["image"];
+        if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+            header("Location: /profile/$currentUserId");
+            exit();
         }
 
         $data = [
-            "title" => $title,
-            "description" => $description,
-            "image_post" => $imagePost
+            "title" => trim(htmlspecialchars($_POST["title"])),
+            "description" => trim(htmlspecialchars($_POST["description"])),
+            "image_post" => $_FILES["image"]
         ];
 
         $this->validationResult = $this->validationData->validate($data, "validateEditPost");
 
         if (!$this->validationResult->passed()) {
-            $errors = $this->validationData->errors();
-            include(__DIR__ . "/../Views/edit.php");
-            return;
+            $_SESSION["errors"] = $this->validationData->errors();
+            $_SESSION["old"] = $data;
+            header("Location: $path");
+            exit();
         }
 
         if ($this->validationResult->passed()) {
-            // dd($post);
-            // dd($_SESSION["user"]);
-            // die;
             if (!$post->isOwner($currentUserId)) {
                 $this->validationData->addErrorException("Редактировать пост может только создатель");
-                $errors = $this->validationData->errors();
-                include(__DIR__ . "/../Views/edit.php");
-                return;
+                $_SESSION["errors"] = $this->validationData->errors();
+                $_SESSION["old"] = $data;
+                header("Location: $path");
+                exit();
             }
 
-            if (empty($title) && empty($description) && empty($imagePost["tmp_name"])) {
+            if (empty($data["title"]) && empty($data["description"]) && empty($data["image_post"]["tmp_name"])) {
                 $this->validationData->addErrorException("Все поля пустые! Заполните хотя бы одно поле");
-                $errors = $this->validationData->errors();
-                include(__DIR__ . "/../Views/edit.php");
-                return;
+                $_SESSION["errors"] = $this->validationData->errors();
+                $_SESSION["old"] = $data;
+                header("Location: $path");
+                exit();
             }
 
-            $this->postRepo->update($post->getId(), $post->getIdCreator(), $title, $description, $imagePost);
-            header("Location: /posts");
+            $this->postRepo->update($post->getId(), $post->getIdCreator(), $data["title"], $data["description"], $data["image_post"]);
+            header("Location: /");
         }
     }
 }

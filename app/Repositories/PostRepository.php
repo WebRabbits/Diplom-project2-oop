@@ -56,6 +56,7 @@ class PostRepository implements PostRepositoriesInterface
             "id_creator" => $idCreator,
             "title" => $title,
             "description" => $description,
+            "date" => date("Y-m-d H:i:s"),
             "image_post" => $uploadImage
         ])->where("id = :id", ["id" => $id]);
 

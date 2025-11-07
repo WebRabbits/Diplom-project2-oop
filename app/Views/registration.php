@@ -3,6 +3,7 @@ $this->layout("layout", [
     "title" => "Регистрация",
     "hide_header" => true
 ]);
+
 $errors = $errors ?? [];
 
 $getError = function ($field) use ($errors) {
@@ -58,7 +59,7 @@ $hasErrors = !empty($errors);
                                         <input type="text" name="username" id="username"
                                             class="form-control <?= !empty($getError("username")) ? "is-invalid" : "" ?>"
                                             placeholder="Имя пользователя"
-                                            value="<?= $_POST["username"] ?? '' ?>">
+                                            value="<?= $old["username"] ?? "" ?>">
                                         <div class="invalid-feedback"><?= $getError("username"); ?></div>
                                     </div>
                                     <div class="form-group">
@@ -66,7 +67,7 @@ $hasErrors = !empty($errors);
                                         <input type="email" name="email" id="emailverify"
                                             class="form-control <?= !empty($getError("email")) ? "is-invalid" : "" ?>"
                                             placeholder="Эл. адрес"
-                                            value="<?= $_POST["email"] ?? "" ?>">
+                                            value="<?= $old["email"] ?? "" ?>">
                                         <div class="invalid-feedback"><?= $getError("email") ?></div>
                                         <div class="help-block">Эл. адрес будет вашим логином при авторизации</div>
                                     </div>
@@ -75,7 +76,7 @@ $hasErrors = !empty($errors);
                                         <input type="password" name="password" id="userpassword"
                                             class="form-control <?= !empty($getError("password")) ? "is-invalid" : "" ?>"
                                             placeholder=""
-                                            value="<?= $_POST["password"] ?? '' ?>">
+                                            value="<?= $old["password"] ?? "" ?>">
                                         <div class="invalid-feedback"><?= $getError("password") ?></div>
                                     </div>
 

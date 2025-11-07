@@ -4,6 +4,17 @@ $this->layout("layout", [
     "extra_css" => "/css/fa-regular.css"
 ]);
 
+$errors = $_SESSION["errors"] ?? "";
+$hasErrors = !empty($errors);
+if($hasErrors) {
+    unset($_SESSION["errors"]);
+}
+
+$getError = function($field) use ($errors){
+    return $errors[$field][0] ?? "";
+};
+
+
 // dd($posts);
 ?>
 <?php if (!empty($user)): ?>
@@ -51,9 +62,18 @@ $this->layout("layout", [
                         </div>
                     </div>
                 </div>
+                <div class="d-grid mb-4">
+                    <a href="/posts/add" class="btn btn-success btn-lg">Создать новый пост</a>
+                </div>
+                <?php if (!empty($errors)): ?>
+                    <div class="alert alert-danger" id="generalError">
+                        Уведомление: <?= $getError("errException");?> 
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
-        <?php if (isset($posts)): ?>
+
+        <?php if (!empty($posts)): ?>
             <div class="row row-cols-1 row-cols-md-4 g-4">
                 <?php foreach ($posts as $post): ?>
                     <div class="col mb-3">
@@ -64,7 +84,7 @@ $this->layout("layout", [
                                 <p class="card-text add-hidden-text-content"><?= $post->getDescription() ?></p>
                                 <div class="row row-cols-1 row-cols-md-2">
                                     <div class="col">
-                                        <a href="/posts/view/<?= $post->getId()?>" class="primary-text stretched-link text-start">Читать полностью...</a>
+                                        <a href="/posts/view/<?= $post->getId() ?>" class="primary-text stretched-link text-start">Читать полностью...</a>
                                     </div>
                                     <div class="col">
                                         <?php if ($post->getIsActive()): ?>
@@ -81,22 +101,29 @@ $this->layout("layout", [
                                         <small class="text-muted">Изменён <?= $post->getDatePublished() ?></small>
                                     </div>
                                     <div class="col-md-auto ms-md-auto">
-                                        <div class="btn-group">
-                                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                Действия
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a href="/posts/edit/<?= $post->getId()?>" class="dropdown-item">Изменить пост</a></li>
-                                                <li><a href="" class="dropdown-item">Активировать</a></li>
-                                                <li><a href="" class="dropdown-item">Добавить в архив</a></li>
-                                            </ul>
-                                        </div>
+                                        <?php 
+                                            $this->insert("post_actions", [
+                                                "post" => $post,
+                                                "allowedActions" => ["edit", "active", "inactive", "delete"]
+                                            ])
+                                        ?>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="row">
+                <div class="col-lg-6 col-xl-6 m-auto">
+                    <div class="card bg-warning">
+                        <div class="card-body">
+                            <p class="h5">Тут пока что ничего нет... <br>
+                                Создайте новый пост, чтобы привлечь к себе внимание =)</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         <?php endif; ?>
     </main>
