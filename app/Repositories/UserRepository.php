@@ -26,7 +26,6 @@ class UserRepository implements UserRepositoriesInterface
         $stmt->execute($select->getBindValues());
 
         $data = $stmt->fetch(PDO::FETCH_OBJ);
-
         // return $data;
         return $data ? $this->createUserFromData($data) : false; // При добавлении DI контейнера - заменить на эту строку
     }
@@ -43,19 +42,20 @@ class UserRepository implements UserRepositoriesInterface
     }
 
     public function create(string $email, string $password, string $username): bool|User
-    {        
-        // $password = password_hash($password, PASSWORD_DEFAULT);
-
+    {   
+        $user = User::createUser(null, $email, $password, $username);
+        
         $insert = $this->queryFactory->newInsert();
         $insert->into("users")->cols([
             "email" => $email,
             "password" => password_hash($password, PASSWORD_DEFAULT),
-            "username" => $username
+            "username" => $username,
+            "status" => $user->getStatus()
         ]);
         $stmt = $this->pdo->prepare($insert->getStatement());
         $stmt->execute($insert->getBindValues());
 
-        $userId =  $this->pdo->lastInsertId(); 
+        $userId =  $this->pdo->lastInsertId();
         
         return $userId ? User::createUser($userId, $email, $password, $username) : false;
     }
@@ -66,7 +66,8 @@ class UserRepository implements UserRepositoriesInterface
             $data->id,
             $data->email,
             $data->password,
-            $data->username
+            $data->username,
+            $data->status
         );
     }
 }

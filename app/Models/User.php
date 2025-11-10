@@ -7,13 +7,14 @@ class User
 
     const STATUS_ACTIVATE = "active";
     const STATUS_DISABLED = "disabled";
+    const STATUS_PENDING = "pending";
     private ?int $id = null;
     private string $email;
     private string $password; 
     private string $username;
     private string $status;
 
-    public function __construct(?int $id = null, string $email = "", string $password = "", string $username = "", string $status = "activate")
+    public function __construct(?int $id = null, string $email = "", string $password = "", string $username = "", $status = self::STATUS_PENDING)
     {
 
         if(empty($id)) {
@@ -36,12 +37,12 @@ class User
         $this->email = $email;
         $this->password = $password;
         $this->username = $username;
-        $this->status = self::STATUS_ACTIVATE;
+        $this->status = $status;
     }
 
-    public static function createUser(int $id, string $email, string $password, string $username): User {
+    public static function createUser(?int $id, string $email, string $password, string $username): User {
         $password = password_hash($password, PASSWORD_DEFAULT);
-        $status = self::STATUS_ACTIVATE;
+        $status = self::STATUS_PENDING;
 
         return new self($id, $email, $password, $username, $status);
     }
