@@ -2,232 +2,141 @@
 
 namespace App\Models;
 
+use App\Models\ValueObject\Email;
+use App\Models\ValueObject\Password;
+use App\Models\ValueObject\ChangePasswordRequest;
+use App\Models\ValueObject\UserId;
+use App\Models\ValueObject\Username;
+use App\Models\ValueObject\UserStatus;
+use DomainException;
+
 class User
 {
 
-    const STATUS_ACTIVATE = "active";
-    const STATUS_DISABLED = "disabled";
-    const STATUS_PENDING = "pending";
-    private ?int $id = null;
-    private string $email;
-    private string $password; 
-    private string $username;
-    private string $status;
+    // const STATUS_ACTIVATE = "active";
+    // const STATUS_DISABLED = "disabled";
+    // const STATUS_PENDING = "pending";
+    // private ?int $id = null;
+    // private string $email;
+    // private string $password; 
+    // private string $username;
+    // private string $status;
 
-    public function __construct(?int $id = null, string $email = "", string $password = "", string $username = "", $status = self::STATUS_PENDING)
+    private int $id;
+    private UserId $secondaryId;
+    private Email $email;
+    private Password $password;
+    private Username $username;
+    private UserStatus $status;
+
+
+    public function __construct(int $id, UserId $secondaryId, Email $email, Password $password, Username $username, UserStatus $status)
     {
 
-        if(empty($id)) {
-            throw new \InvalidArgumentException("ID cannot be empty");
-        }
-
-        if(empty($email)) {
-            throw new \InvalidArgumentException("Email cannot be empty");
-        }
-
-        if(empty($password)) {
-            throw new \InvalidArgumentException("Password cannot be empty");
-        }
-
-        if(empty($username)) {
-            throw new \InvalidArgumentException("Username cannot be empty");
-        }
-
         $this->id = $id;
+        $this->secondaryId = $secondaryId;
         $this->email = $email;
         $this->password = $password;
         $this->username = $username;
         $this->status = $status;
     }
 
-    public static function createUser(?int $id, string $email, string $password, string $username): User {
-        $password = password_hash($password, PASSWORD_DEFAULT);
-        $status = self::STATUS_PENDING;
-
-        return new self($id, $email, $password, $username, $status);
+    // Внутренний метод, который используется для создания независимого внутреннего объекта модели класса User.
+    // Метод используется внутри репозитория для создания реального объекта модели класса User с уже реальными полученными данными из БД.
+    public static function createUser(int $id, UserId $secondaryId, Email $email, Password $password, Username $username): User
+    {
+        return new self($id, $secondaryId, $email, $password, $username, UserStatus::pending());
     }
 
-    public function changeEmail(string $newEmail): void{
-        if(!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException("Email is incorrect");
+    // Метод используется в контроллере для создания объекта модели класса User на основе полученных данных от пользователя в момент регистрации. Собирает объект модели с уже реальными обработанными данными.
+    // После чего, передаёт из в метод create() внутри репозитория для записи данных в БД.
+    public static function register(Email $email, Password $password, Username $username)
+    {
+        return new self(0, UserId::newId(), $email, $password, $username, UserStatus::pending());
+    }
+
+    public function changeEmail(Email $newEmail): void
+    {
+        if ($this->email->equals($newEmail)) {
+            throw new DomainException("New email must be different current email");
         }
 
         $this->email = $newEmail;
     }
 
-    public function changePassword(string $currentPassword, string $newPassword, string $repeatPassword): void {
-        if(empty($currentPassword) || empty($newPassword) || empty($repeatPassword)) {
-            throw new \InvalidArgumentException("Fields cannot be empty");
+    public function changePassword(ChangePasswordRequest $requestChangePassword): void
+    {
+
+
+        if (!$this->password->verify($requestChangePassword->getCurrentPassword())) {
+            throw new DomainException("Current password is incorrect");
         }
 
-        if(!password_verify($currentPassword, $this->getPassword())) {
-            throw new \InvalidArgumentException("Current password is incorrect");
+        if ($this->password->verify($requestChangePassword->getNewPassword())) {
+            throw new DomainException("New password cannot be same as current password");
         }
 
-        if (password_verify($newPassword, $this->getPassword())) {
-            throw new \InvalidArgumentException("New password cannot be same as current password");
+        $this->password = Password::makePasswordHash($requestChangePassword->getNewPassword());
+    }
+
+    public function changeUsername(Username $username): void
+    {
+        $this->username = $username;
+    }
+
+    // public function passwordHash($password): string {
+    //     return password_hash($password, PASSWORD_DEFAULT);
+    // }
+
+    // public function passwordVerify($password): bool {
+    //     return password_verify($password, $this->getPassword());
+    // }
+
+
+    public function activate()
+    {
+        if ($this->status->canActive()) {
+            throw new DomainException("User cannot be activated because the user is already active");
         }
 
-        if($newPassword !== $repeatPassword) {
-            throw new \InvalidArgumentException("Password values do not match");
+        $this->status = UserStatus::active();
+    }
+
+    public function disabled()
+    {
+        if ($this->status->canDisable()) {
+            throw new DomainException("User cannot be disabled because thee user is already status disable");
         }
 
-        if(strlen($newPassword) < 8 || strlen($repeatPassword) < 8) {
-            throw new \InvalidArgumentException("New password and Repeat password must be at least 8 characters long");
-        }
-
-        $this->password = $this->passwordHash($newPassword);
+        $this->status = UserStatus::disable();
     }
 
-    public function changeUsername(string $username): void {
-        if(strlen($username) < 2) {
-            throw new \InvalidArgumentException("Username must be at least 2 characters long");
-        }
 
-        $this->username = trim($username);
-    }
-
-    public function passwordHash($password): string {
-        return password_hash($password, PASSWORD_DEFAULT);
-    }
-
-    public function passwordVerify($password): bool {
-        return password_verify($password, $this->getPassword());
-    }
-
-    public function activate(): void{
-        if($this->isActivate()) {
-            throw new \InvalidArgumentException("User cannot be activated because the user is already active");
-        }
-
-        $this->status = self::STATUS_ACTIVATE;
-    }
-
-    public function disable() {
-        if($this->isDisabled()) {
-            throw new \InvalidArgumentException("User cannot be disabled because the user is already disable");
-        }
-
-        $this->status = self::STATUS_DISABLED;
-    }
-
-    public function isActivate(): string {
-        return $this->status = self::STATUS_ACTIVATE;
-    }
-
-    public function isDisabled(): string {
-        return $this->status = self::STATUS_DISABLED;
-    }
-    public function getId(): ?int
+    public function getId()
     {
         return $this->id;
     }
-
-    public function getEmail(): string
+    public function getSecondaryId(): UserId|null
+    {
+        return $this->secondaryId;
+    }
+    public function getEmail(): Email
     {
         return $this->email;
     }
 
-    public function getPassword(): string{
+    public function getPassword(): Password
+    {
         return $this->password;
     }
 
-    public function getUsername(): string
+    public function getUsername(): Username
     {
         return $this->username;
     }
 
-    public function getStatus(): string{
+    public function getStatus(): UserStatus
+    {
         return $this->status;
     }
-
-    // public function registration($email, $password, $username)
-    // {
-    //     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    //         echo "Некорректный Email-адрес";
-    //         return;
-    //     }
-
-    //     $hash_password = password_hash($password, PASSWORD_DEFAULT);
-
-    //     $userData = $this->user->findByEmail($email);
-
-    //     if (isset($userData->email)) {
-    //         echo "Такой пользователь уже существует";
-    //         return;
-    //     }
-        
-        
-    //     $lastInsertID = $this->user->create($email, $hash_password, $username);
-
-    //     if ($lastInsertID) {
-    //         $this->id = $lastInsertID;
-    //         $this->email = $email;
-    //         $this->password = $hash_password;
-    //         $this->username = $username;
-
-    //         // echo "Регистрация прошла успешно";
-    //         // return true;
-    //     }
-
-    //     echo "Возникла ошибка при регистрации";
-    //     return false;
-    // }
-
-    // public function login($email, $password)
-    // {
-    //     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    //         echo "Некорректный Email-адрес";
-    //         return;
-    //     }
-
-    //     $userData = $this->user->findByEmail($email);
-
-    //     if (!isset($userData->email)) {
-    //         echo "Пользователь не найден";
-    //         return;
-    //     }
-
-    //     if (!password_verify($password, $userData->password)) {
-    //         echo "Неверный пароль";
-    //         return;
-    //     }
-
-    //     if (isset($userData)) {
-    //         $this->id = $userData->id;
-    //         $this->email = $userData->email;
-    //         $this->username = $userData->username;
-
-    //         echo "Авторизация успешна.";
-    //         return true;
-    //     }
-
-    //     echo "Произошла ошибка при авторизации";
-    //     return false;
-    // }
-
-    // public function logout()
-    // {
-    //     $this->id = null;
-    //     $this->email = "";
-    //     $this->password = "";
-    //     $this->username = "";
-        
-    //     echo "Вы вышли из системы!";
-    //     return true;
-    // }
-
-    // Геттеры
-
-    // private function getFindEmail($email) {
-    //     return $this->db->getByCondition(table:"users", operator:"=", columns: ["*"], where: ["email" => $email])->getOneResult();
-    // }
-
-    // private function createUser($email, $password, $username){
-    //     return $this->db->insert(table:"users", columns:[
-    //         "email" => $email,
-    //         "password" => $password,
-    //         "username" => $username
-    //     ]);
-    // }
 }

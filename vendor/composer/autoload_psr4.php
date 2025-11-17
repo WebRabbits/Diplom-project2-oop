@@ -6,6 +6,8 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Ramsey\\Uuid\\' => array($vendorDir . '/ramsey/uuid/src'),
+    'Ramsey\\Collection\\' => array($vendorDir . '/ramsey/collection/src'),
     'Psr\\Container\\' => array($vendorDir . '/psr/container/src'),
     'League\\Plates\\' => array($vendorDir . '/league/plates/src'),
     'Laravel\\SerializableClosure\\' => array($vendorDir . '/laravel/serializable-closure/src'),
@@ -13,6 +15,7 @@ return array(
     'Invoker\\' => array($vendorDir . '/php-di/invoker/src'),
     'FastRoute\\' => array($vendorDir . '/nikic/fast-route/src'),
     'DI\\' => array($vendorDir . '/php-di/php-di/src'),
+    'Brick\\Math\\' => array($vendorDir . '/brick/math/src'),
     'Aura\\SqlQuery\\' => array($vendorDir . '/aura/sqlquery/src'),
     'App\\' => array($baseDir . '/app'),
 );

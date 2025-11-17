@@ -6,6 +6,8 @@ use App\Repositories\UserRepository;
 use App\Services\ValidationService;
 use App\Services\PasswordHasher;
 use League\Plates\Engine;
+use App\Models\ValueObject\Email;
+use App\Models\ValueObject\Password;
 
 class AuthController
 {
@@ -55,7 +57,14 @@ class AuthController
         }
 
         if ($this->validationResult->passed()) {
-            $user = $this->userRepo->findByEmail($data["email"]);
+            $email = new Email($data["email"]);
+            $password = Password::makePasswordHash($data["password"]);
+
+            $user = $this->userRepo->findByEmail($email);
+
+            // dd($user);
+            // dd($user->getEmail());
+
 
             if (!$user) {
                 $this->validationData->addErrorException("Пользователя с данным Email не существует!");
@@ -63,9 +72,10 @@ class AuthController
                 $_SESSION["old"] = $data;
                 header("Location: /auth");
                 exit();
-
             } else {
-                $isValidPassword = $this->hasher->passwordVerify($data["password"], $user->getPassword())->getPasswordHashCheck();
+                // $isValidPassword = $this->hasher->passwordVerify($data["password"], $user->getPassword())->getPasswordHashCheck();
+
+                $isValidPassword = $user->getPassword()->verify($data["password"]);
 
                 if (!$isValidPassword) {
                     $this->validationData->addErrorException("Неверно указан пароль!");
@@ -78,16 +88,16 @@ class AuthController
 
 
             if ($user && $isValidPassword) {
-                setcookie("login", $user->getUsername(), time() + 3600, "/", "", true, true);
+                setcookie("login", $user->getUsername()->getValue(), time() + 3600, "/", "", true, true);
                 session_regenerate_id(true);
 
                 $_SESSION["user"] = [
                     "idUser" => $user->getId(),
-                    "email" => $user->getEmail(),
-                    "username" => $user->getUsername()
+                    "email" => $user->getEmail()->getValue(),
+                    "username" => $user->getUsername()->getValue()
                 ];
 
-                header("Location: /profile/".$user->getId());
+                header("Location: /profile/" . $user->getId());
                 exit();
             }
         }

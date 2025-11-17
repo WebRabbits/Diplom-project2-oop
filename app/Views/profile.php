@@ -12,8 +12,10 @@ if($hasErrors) {
 
 $getError = function($field) use ($errors){
     return $errors[$field][0] ?? "";
+
 };
 
+dd($user);
 
 // dd($posts);
 ?>
@@ -21,7 +23,7 @@ $getError = function($field) use ($errors){
     <main id="js-page-content" role="main" class="page-content mt-3">
         <div class="subheader">
             <h1 class="subheader-title">
-                Добро пожаловать! <?= $user->getUsername() ?>
+                Добро пожаловать! <?= $user->getUsername()->getValue() ?>
             </h1>
         </div>
         <div class="row">
@@ -33,7 +35,7 @@ $getError = function($field) use ($errors){
                             <div class="d-flex flex-column align-items-center justify-content-center p-4">
                                 <img src="/img/demo/avatars/avatar-admin-lg.png" class="rounded-circle shadow-2 img-thumbnail" alt="">
                                 <h5 class="mb-0 fw-700 text-center mt-3">
-                                    <?= $user->getUsername() ?>
+                                    <?= $user->getUsername()->getValue() ?>
                                     <!-- <small class="text-muted mb-0">Toronto, Canada</small> -->
                                 </h5>
                                 <!-- <div class="mt-4 text-center demo">
@@ -53,8 +55,8 @@ $getError = function($field) use ($errors){
                             <div class="p-3 text-center">
                                 <!-- <a href="tel:+13174562564" class="mt-1 d-block fs-sm fw-400 text-dark">
                                         <i class="fas fa-mobile-alt text-muted mr-2"></i> +1 317-456-2564</a> -->
-                                <a href="mailto:<?= $user->getEmail() ?>" class="mt-1 d-block fs-sm fw-400 text-dark">
-                                    <i class="fas fa-mouse-pointer text-muted mr-2"></i><?= $user->getEmail() ?></a>
+                                <a href="mailto:<?= $user->getEmail()->getValue() ?>" class="mt-1 d-block fs-sm fw-400 text-dark">
+                                    <i class="fas fa-mouse-pointer text-muted mr-2"></i><?= $user->getEmail()->getValue() ?></a>
                                 <!-- <address class="fs-sm fw-400 mt-4 text-muted">
                                         <i class="fas fa-map-pin mr-2"></i> Восточные Королевства, Штормград 15
                                     </address> -->

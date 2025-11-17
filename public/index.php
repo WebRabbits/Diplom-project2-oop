@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\ValueObject\ChangePasswordRequest;
+use App\Models\ValueObject\Password;
+use App\Models\ValueObject\Username;
+
 session_start();
 
 require_once(__DIR__ . "/../vendor/autoload.php");
@@ -8,6 +12,8 @@ require_once(__DIR__ . "/../app/containerBuilder/ContainerBuilder.php");
 
 use App\Models\User;
 use App\Models\Post;
+use App\Models\ValueObject\Email;
+use App\Models\ValueObject\UserId;
 use App\Services\ValidationService;
 
 
@@ -122,6 +128,27 @@ use App\Services\ValidationService;
 
 // $db->delete("posts", 72); // Удаление данных из таблицы по преданному идентификатору записи в БД
 
+
+// $user = User::createUser(UserId::newId(), new Email("test1@gmail.com"), new Password("test123"), new Username("Alex"));
+// dd($user);
+
+// $user->changeEmail(new Email("lala2@gmail.com"));
+// dd($user);
+
+// $user->changeUsername(new Username("Karl"));
+// dd($user);
+
+
+// dd($user->getId());
+// dd($user->getEmail());
+// dd($user->getPassword());
+// dd($user->getUsername());
+// dd($user->getStatus());
+
+// $user->changePassword(new ChangePasswordRequest("test123", "test12345", "test12345"));
+// dd($user);
+
+// die;
 
 //// Реализация роутинга на проекте с использованием DI-контейнера
 $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {

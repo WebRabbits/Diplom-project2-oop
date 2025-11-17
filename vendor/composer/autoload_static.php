@@ -10,10 +10,16 @@ class ComposerStaticInit8d070178755c320c69f93ee4800660ef
         '3917c79c5052b270641b5a200963dbc2' => __DIR__ . '/..' . '/kint-php/kint/init.php',
         '253c157292f75eb38082b5acb06f3f01' => __DIR__ . '/..' . '/nikic/fast-route/src/functions.php',
         'b33e3d135e5d9e47d845c576147bda89' => __DIR__ . '/..' . '/php-di/php-di/src/functions.php',
+        'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
         'f78b0ffda71fc7600b3e5365a194190c' => __DIR__ . '/../..' . '/dumper.php',
     );
 
     public static $prefixLengthsPsr4 = array (
+        'R' => 
+        array (
+            'Ramsey\\Uuid\\' => 12,
+            'Ramsey\\Collection\\' => 18,
+        ),
         'P' => 
         array (
             'Psr\\Container\\' => 14,
@@ -39,6 +45,10 @@ class ComposerStaticInit8d070178755c320c69f93ee4800660ef
         array (
             'DI\\' => 3,
         ),
+        'B' => 
+        array (
+            'Brick\\Math\\' => 11,
+        ),
         'A' => 
         array (
             'Aura\\SqlQuery\\' => 14,
@@ -47,6 +57,14 @@ class ComposerStaticInit8d070178755c320c69f93ee4800660ef
     );
 
     public static $prefixDirsPsr4 = array (
+        'Ramsey\\Uuid\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/ramsey/uuid/src',
+        ),
+        'Ramsey\\Collection\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/ramsey/collection/src',
+        ),
         'Psr\\Container\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
@@ -74,6 +92,10 @@ class ComposerStaticInit8d070178755c320c69f93ee4800660ef
         'DI\\' => 
         array (
             0 => __DIR__ . '/..' . '/php-di/php-di/src',
+        ),
+        'Brick\\Math\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/brick/math/src',
         ),
         'Aura\\SqlQuery\\' => 
         array (
