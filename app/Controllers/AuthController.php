@@ -62,10 +62,6 @@ class AuthController
 
             $user = $this->userRepo->findByEmail($email);
 
-            // dd($user);
-            // dd($user->getEmail());
-
-
             if (!$user) {
                 $this->validationData->addErrorException("Пользователя с данным Email не существует!");
                 $_SESSION["errors"] = $this->validationResult->errors();
@@ -73,8 +69,6 @@ class AuthController
                 header("Location: /auth");
                 exit();
             } else {
-                // $isValidPassword = $this->hasher->passwordVerify($data["password"], $user->getPassword())->getPasswordHashCheck();
-
                 $isValidPassword = $user->getPassword()->verify($data["password"]);
 
                 if (!$isValidPassword) {
@@ -85,7 +79,6 @@ class AuthController
                     exit();
                 }
             }
-
 
             if ($user && $isValidPassword) {
                 setcookie("login", $user->getUsername()->getValue(), time() + 3600, "/", "", true, true);

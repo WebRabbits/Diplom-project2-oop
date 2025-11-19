@@ -7,8 +7,6 @@ use Aura\SqlQuery\QueryFactory;
 use PDO;
 use App\Models\Post;
 
-use function PHPSTORM_META\type;
-
 class PostRepository implements PostRepositoriesInterface
 {
     private PDO $pdo;

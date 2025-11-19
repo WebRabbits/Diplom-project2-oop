@@ -67,6 +67,7 @@ class UserRepository implements UserRepositoriesInterface
 
     // При добавлении DI контейнера - использовать данный метод, чтобы вернуть Объект класса User, а не stdClass
     public function createUserFromData($data): User{
+        dd($data);
         $secondaryId = new UserId($data->secondary_id);
         $email = new Email($data->email);
         $password = new Password($data->password);

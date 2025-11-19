@@ -15,8 +15,6 @@ $getError = function($field) use ($errors){
 
 };
 
-dd($user);
-
 // dd($posts);
 ?>
 <?php if (!empty($user)): ?>

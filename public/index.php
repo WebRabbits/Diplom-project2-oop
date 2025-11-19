@@ -148,6 +148,7 @@ use App\Services\ValidationService;
 // $user->changePassword(new ChangePasswordRequest("test123", "test12345", "test12345"));
 // dd($user);
 
+
 // die;
 
 //// Реализация роутинга на проекте с использованием DI-контейнера
