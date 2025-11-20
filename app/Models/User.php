@@ -84,15 +84,6 @@ class User
         $this->username = $username;
     }
 
-    // public function passwordHash($password): string {
-    //     return password_hash($password, PASSWORD_DEFAULT);
-    // }
-
-    // public function passwordVerify($password): bool {
-    //     return password_verify($password, $this->getPassword());
-    // }
-
-
     public function activate()
     {
         if ($this->status->canActive()) {
