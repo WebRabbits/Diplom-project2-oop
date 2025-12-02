@@ -1,7 +1,7 @@
 <?php
-$this->layout("layout", ["title" => $post->getTitle()]);
+$this->layout("layout", ["title" => $post->getTitle()->getValue()]);
 
-// dd($post);
+// dd($post->getIMagePost());
 // dd($creatorName);
 ?>
 
@@ -13,12 +13,12 @@ $this->layout("layout", ["title" => $post->getTitle()]);
                 <div class="card-body p-4">
                     <!-- Заголовок -->
                     <h1 class="card-title text-dark mb-4 pb-2 border-bottom border-primary border-3">
-                        <?= $post->getTitle() ?>
+                        <?= $post->getTitle()->getValue() ?>
                     </h1>
 
                     <!-- Картинка -->
                     <div class="mb-4">
-                        <img src="<?= $post->getImagePost() ?>"
+                        <img src="<?= $post->getImagePost()->getValue() ?>"
                             alt="Изображение поста"
                             class="img-fluid rounded-3 w-100"
                             style="max-height: 400px; object-fit: contain;">
@@ -30,7 +30,7 @@ $this->layout("layout", ["title" => $post->getTitle()]);
                             Описание:
                         </p>
                         <p class="text-muted lh-lg">
-                            <?= $post->getDescription() ?>
+                            <?= $post->getDescription()->getValue() ?>
                         </p>
                     </div>
                 </div>
@@ -49,17 +49,21 @@ $this->layout("layout", ["title" => $post->getTitle()]);
                     </div>
 
                     <!-- Дата изменения -->
+                    <?php if($post->getPublishedTime()):?>
                     <div class="border-start border-success border-4 ps-3 mb-4">
                         <small class="text-muted d-block">Дата последнего изменения</small>
-                        <span class="text-dark fw-semibold"><?= $post->getDatePublished() ?></span>
+                        <span class="text-dark fw-semibold"><?= $post->formatDateTime() ?></span>
                     </div>
+                    <?php endif;?>
 
                     <!-- Статус поста -->
                     <div class="border-start border-warning border-4 ps-3 mb-4">
                         <small class="text-muted d-block">Статус поста</small>
-                        <?php if ($post->getIsActive()): ?>
+                        <?php if ($post->isPublishedPost()): ?>
                             <span class="text-success fw-semibold">● Активен</span>
-                        <?php else: ?>
+                        <?php elseif ($post->isDraftPost()): ?>
+                            <span class="text-dark fw-semibold">● Черновик</span>
+                        <?php else:?>
                             <span class="text-dark fw-semibold">● Архивирован</span>
                         <?php endif; ?>
                     </div>

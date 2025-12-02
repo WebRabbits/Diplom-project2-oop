@@ -77,17 +77,19 @@ $getError = function($field) use ($errors){
             <div class="row row-cols-1 row-cols-md-4 g-4">
                 <?php foreach ($posts as $post): ?>
                     <div class="col mb-3">
-                        <div class="card h-100 <?= $post->getIsActive() ? "border-info" : "border-dark" ?>">
-                            <img src="<?= $post->getImagePost() ?>" class="card-img-top img-thumbnail" alt="" style="max-height: 200px; object-fit: contain;">
+                        <div class="card h-100 <?= $post->getStatus() ? "border-info" : "border-dark" ?>">
+                            <img src="<?= $post->getImagePost()->getValue() ?>" class="card-img-top img-thumbnail" alt="" style="max-height: 200px; object-fit: contain;">
                             <div class="card-body">
-                                <h5 class="card-title"><?= $post->getTitle() ?></h5>
-                                <p class="card-text add-hidden-text-content"><?= $post->getDescription() ?></p>
+                                <h5 class="card-title"><?= $post->getTitle()->getValue() ?></h5>
+                                <p class="card-text add-hidden-text-content"><?= $post->getDescription()->getValue() ?></p>
                                 <div class="row row-cols-1 row-cols-md-2">
                                     <div class="col">
-                                        <a href="/posts/view/<?= $post->getId() ?>" class="primary-text stretched-link text-start">Читать полностью...</a>
+                                        <a href="/posts/view/<?= $post->getId()->getValue() ?>" class="primary-text stretched-link text-start">Читать полностью...</a>
                                     </div>
                                     <div class="col">
-                                        <?php if ($post->getIsActive()): ?>
+                                        <?php if ($post->getStatus()->getValue() === 1): ?>
+                                            <p class="text-right text-warning">Черновик</p>
+                                        <?php elseif($post->getStatus()->getValue() === 2):?>
                                             <p class="text-right text-success">Активен</p>
                                         <?php else: ?>
                                             <p class="text-right text-dark">Архивирован</p>
@@ -97,14 +99,16 @@ $getError = function($field) use ($errors){
                             </div>
                             <div class="card-footer">
                                 <div class="row row-cols-1 row-cols-md-2">
+                                    <?php if($post->getPublishedTime()):?>
                                     <div class="col-md-auto">
-                                        <small class="text-muted">Изменён <?= $post->getDatePublished() ?></small>
+                                        <small class="text-muted">Изменён: <?= $post->formatDateTime()?></small>
                                     </div>
+                                    <?php endif;?>
                                     <div class="col-md-auto ms-md-auto">
                                         <?php 
                                             $this->insert("post_actions", [
                                                 "post" => $post,
-                                                "allowedActions" => ["edit", "active", "inactive", "delete"]
+                                                "allowedActions" => ["edit", "publish", "draft", "archived", "delete"]
                                             ])
                                         ?>
                                     </div>

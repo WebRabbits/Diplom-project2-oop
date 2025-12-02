@@ -13,9 +13,9 @@ class CreatorId{
             throw new DomainException("Creator ID cannot be empty");
         }
 
-        if(!Uuid::isValid($value)) {
-            throw new DomainException("Invalid Creator ID value. Must be a valid Uuid");
-        }
+        // if(!Uuid::isValid($value)) {
+        //     throw new DomainException("Invalid Creator ID value. Must be a valid Uuid");
+        // }
 
         $this->value = $value;
     }

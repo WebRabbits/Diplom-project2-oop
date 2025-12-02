@@ -2,17 +2,24 @@
 
 namespace App\Repositories\Interfaces;
 
+use App\Models\Post;
+use App\Models\ValueObject\Post\CreatorId;
+use App\Models\ValueObject\Post\PostId;
+use App\Models\ValueObject\Post\Status;
+use DateTime;
+
 interface PostRepositoriesInterface
 {
-    public function create(int $idCreator, string $title, string $description, array $image);
-    public function update(int $id, int $idCreator, string $title, string $description, array $image);
-    public function delete(int $id);
+    public function create(Post $post);
+    // int $idCreator, string $title, string $description, array $image
+    public function update(Post $post);
+    public function delete(Post $post);
     public function getAll();
-    public function findById(int $id);
-    public function findPostsByCreator(int $idCreator);
-    public function makeInactive(int $id);
-    public function makeActive(int $id);
-    public function uploadImage(array $image);
-    public function deleteImage(int $idPost);
-    public function createPostFromData(object $data);
+    public function findById(PostId $id);
+    public function findPostsByCreator(CreatorId $creatorId);
+    public function makePublished(Status $status, PostId $id, DateTime $publishedTime);
+    public function makeArchived(Status $status, PostId $id);
+    // public function uploadImage(array $image);
+    // public function deleteImage(PostId $id);
+    public function createPostFromData($data);
 }

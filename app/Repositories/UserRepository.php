@@ -31,14 +31,15 @@ class UserRepository implements UserRepositoriesInterface
         $stmt->execute($select->getBindValues());
 
         $data = $stmt->fetch(PDO::FETCH_OBJ);
-        dd($data);
+        // dd($data);
         // return $data;
         return $data ? $this->createUserFromData($data) : false; // При добавлении DI контейнера - заменить на эту строку
     }
 
-    public function findById(int $id){
+    public function findById(UserId $id){
+        // dd($id->getValue());
         $select = $this->queryFactory->newSelect();
-        $select->cols(["*"])->from("users")->where("id = :id", ["id" => $id]);
+        $select->cols(["*"])->from("users")->where("secondary_id = :secondary_id", ["secondary_id" => $id->getValue()]);
         $stmt = $this->pdo->prepare($select->getStatement());
         $stmt->execute($select->getBindValues());
 
@@ -67,7 +68,7 @@ class UserRepository implements UserRepositoriesInterface
 
     // При добавлении DI контейнера - использовать данный метод, чтобы вернуть Объект класса User, а не stdClass
     public function createUserFromData($data): User{
-        dd($data);
+        // dd($data);
         $secondaryId = new UserId($data->secondary_id);
         $email = new Email($data->email);
         $password = new Password($data->password);

@@ -40,7 +40,7 @@ $hasErrors = !empty($errors);
                                 class="form-control form-control-lg <?= !empty($getError("title")) ? "is-invalid" : "" ?>"
                                 id="postTitle"
                                 placeholder="Введите заголовок поста"
-                                value="<?= $old["title"] ?? $post->getTitle() ?>">
+                                value="<?= $old["title"] ?? $post->getTitle()->getValue() ?>">
                             <div class="invalid-feedback">
                                 <?= $getError("title") ?>
                             </div>
@@ -55,14 +55,14 @@ $hasErrors = !empty($errors);
                                 name="description"
                                 id="postDescription"
                                 rows="6"
-                                placeholder="Введите описание поста"><?= $old["description"] ?? $post->getDescription() ?></textarea>
+                                placeholder="Введите описание поста"><?= $old["description"] ?? $post->getDescription()->getValue() ?></textarea>
                             <div class="invalid-feedback">
                                 <?= $getError("description") ?>
                             </div>
                         </div>
 
                         <div class="mb-4">
-                            <h6>Последняя дата изменения: <?= $post->getDatePublished()?></h6>
+                            <h6>Последняя дата изменения: </h6>
                         </div>
 
                         <!-- Поле для загрузки картинки -->
@@ -90,7 +90,7 @@ $hasErrors = !empty($errors);
                             </label>
                             <div class="border rounded p-3 text-center">
                                 <img id="imagePreview"
-                                    src="<?= $post->getImagePost()?>"
+                                    src="<?= $post->getImagePost()->getValue()?>"
                                     alt="Предпросмотр"
                                     class="img-fluid rounded"
                                     style="max-height: 300px;">

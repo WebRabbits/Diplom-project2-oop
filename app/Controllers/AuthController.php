@@ -85,7 +85,7 @@ class AuthController
                 session_regenerate_id(true);
 
                 $_SESSION["user"] = [
-                    "idUser" => $user->getId(),
+                    "idUser" => $user->getSecondaryId()->getValue(),
                     "email" => $user->getEmail()->getValue(),
                     "username" => $user->getUsername()->getValue()
                 ];

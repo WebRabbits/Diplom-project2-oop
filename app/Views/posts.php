@@ -3,13 +3,18 @@ $this->layout("layout", [
     "title" => "Каталог постов"
 ]);
 
-// dd($_SESSION);
+// dd($allPosts);
+
+// foreach($allPosts as $post) {
+//     dd($post->isPublishedPost());
+//     dd($post->getStatus()->getValue());
+// }
 ?>
 <div class="container py-5">
     <div class="row mb-4">
         <div class="col-12">
             <h1 class="text-center text-dark mb-3">Все посты пользователей</h1>
-            <p class="text-center text-muted">Общее количество постов: <?= count($allPosts) ?></p>
+            <p class="text-center text-muted">Общее количество активных постов: <?= count($allPosts) ?></p>
         </div>
         <?php if (isset($_SESSION["success"])): ?>
             <div class="alert alert-success">
@@ -27,32 +32,32 @@ $this->layout("layout", [
                 <div class="col">
                     <div class="card h-100 shadow-sm border">
                         <div class="card-body">
-                            <h5 class="card-title text-dark mb-3"><?= $post->getTitle() ?></h5>
+                            <h5 class="card-title text-dark mb-3"><?= $post->getTitle()->getValue() ?></h5>
                             <div class="mb-3">
-                                <img src="<?= $post->getImagePost() ?>"
+                                <img src="<?= $post->getImagePost()->getValue() ?>"
                                     alt="Изображение поста"
                                     class="img-fluid rounded w-100"
                                     style="height: 200px; object-fit: contain;">
                             </div>
                             <p class="card-text text-muted mb-3 add-hidden-text-content">
-                                <?= $post->getDescription() ?>
+                                <?= $post->getDescription()->getValue() ?>
                             </p>
                             <div class="border-start border-primary border-3 ps-2 mb-2">
                                 <small class="text-muted">Создатель:</small>
-                                <div class="text-dark fw-semibold"><?= isset($creatorData) ? $creatorData[$post->getIdCreator()] : "Неизвестный" ?></div>
+                                <div class="text-dark fw-semibold"><?= isset($creatorData) ? $creatorData[$post->getCreatorId()->getValue()] : "Неизвестный" ?></div>
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">Изменён: <?= $post->getDatePublished() ?></small>
-                                <?php if ($post->getIsActive()): ?>
+                                <?php if ($post->getPublishedTime()): ?>
+                                    <small class="text-muted"><?= $post->formatDateTime() ?></small>
+                                <?php endif; ?>
+                                <?php if ($post->isPublishedPost()): ?>
                                     <span class="badge bg-success">Активен</span>
-                                <?php else: ?>
-                                    <span class="badge bg-dark">Архивирован</span>
                                 <?php endif; ?>
                             </div>
                         </div>
                         <div class="card-footer bg-transparent border-top">
                             <div class="d-grid">
-                                <a href="/posts/view/<?= $post->getId() ?>" class="btn btn-outline-primary btn-sm">Читать полностью</a>
+                                <a href="/posts/view/<?= $post->getId()->getValue() ?>" class="btn btn-outline-primary btn-sm">Читать полностью</a>
                             </div>
                         </div>
                     </div>

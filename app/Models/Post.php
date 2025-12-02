@@ -13,23 +13,13 @@ use DomainException;
 
 class Post
 {
-    // const STATUS_ACTIVATE = true;
-    // const STATUS_DEACTIVATE = false;
-    // private ?int $id = null;
-    // private ?int $idCreator = null;
-    // private string $title;
-    // private string $description;
-    // private string $datePublished;
-    // private string $imagePost;
-    // private bool $isActive;
-
     private PostId $id;
     private CreatorId $creatorId;
     private Title $title;
     private Description $description;
     private ImagePost $imagePost;
     private Status $status;
-    private ?DateTime $publishedTime;
+    private ?DateTime $publishedTime = null;
 
     public function __construct(PostId $id, CreatorId $creatorId, Title $title, Description $description, ImagePost $imagePost)
     {
@@ -50,6 +40,13 @@ class Post
     public static function newPost(CreatorId $creatorId, Title $title, Description $description, ImagePost $imagePost)
     {
         return new self(PostId::newId(), $creatorId, $title, $description, $imagePost);
+    }
+
+    public static function createFromData(PostId $id, CreatorId $creatorId, Title $title, Description $description, ImagePost $imagePost, Status $status, ?DateTime $publishedTime = null) {
+        $updatedPost = new self($id, $creatorId, $title, $description, $imagePost);
+        $updatedPost->status = $status;
+        $updatedPost->publishedTime = $publishedTime;
+        return $updatedPost;
     }
 
     // Проверка на ID создателя самого пользователя, который, если является создателем поста - может производить его редактирование
@@ -75,7 +72,10 @@ class Post
 
     public function publish()
     {
-        if (!$this->status->canPublished()) {
+        // dd($this->status->isPublished());
+        // dd($this->status->isDraft());
+
+        if ($this->status->isPublished()) {
             throw new DomainException("You cannot change the post status to Published. The post has already been published");
         }
 
@@ -85,16 +85,23 @@ class Post
 
         $this->status = Status::published();
         $this->publishedTime = new DateTime();
+
+        return [
+            "status" => $this->status,
+            "publishedTime" => $this->publishedTime
+        ];
     }
 
 
     public function draft()
     {
-        if (!$this->status->canDraft()) {
-            throw new DomainException("You cannot change the post status to Published. The post has already been published or archived");
+        if ($this->status->isDraft()) {
+            throw new DomainException("You cannot change the post status to Draft. The post has already been draft");
         }
 
         $this->status = Status::draft();
+
+        return $this->status;
     }
 
     public function archived()
@@ -104,6 +111,8 @@ class Post
         }
 
         $this->status = Status::archived();
+
+        return $this->status;
     }
 
     public function getId()
@@ -134,6 +143,18 @@ class Post
     public function getStatus()
     {
         return $this->status;
+    }
+
+    public function isDraftPost(){
+        return $this->status->isDraft();
+    }
+
+    public function isPublishedPost() {
+        return $this->status->isPublished();
+    }
+
+    public function isArchivedPost() {
+        return $this->status->isArchived();
     }
 
     public function getPublishedTime()

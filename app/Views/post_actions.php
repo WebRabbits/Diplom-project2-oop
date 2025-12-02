@@ -1,5 +1,5 @@
 <?php
-$defaultActions = ["edit", "active", "inactive", "delete"];
+$defaultActions = ["edit", "publish", "draft", "archived", "delete"];
 $allowedActions = $allowedActions ?? $defaultActions;
 ?>
 
@@ -9,19 +9,23 @@ $allowedActions = $allowedActions ?? $defaultActions;
     </button>
     <ul class="dropdown-menu">
         <?php if (in_array("edit", $allowedActions)): ?>
-            <li><a href="/posts/edit/<?= $post->getId() ?>" class="dropdown-item">Изменить пост</a></li>
+            <li><a href="/posts/edit/<?= $post->getId()->getValue() ?>" class="dropdown-item">Изменить пост</a></li>
         <?php endif; ?>
 
-        <?php if (in_array("active", $allowedActions)): ?>
-            <li><a href="/posts/active/<?= $post->getId() ?>" class="dropdown-item">Активировать</a></li>
+        <?php if (in_array("publish", $allowedActions)): ?>
+            <li><a href="/posts/publish/<?= $post->getId()->getValue() ?>" class="dropdown-item">Активировать</a></li>
         <?php endif; ?>
 
-        <?php if (in_array("inactive", $allowedActions)): ?>
-            <li><a href="/posts/inactive/<?= $post->getId() ?>" class="dropdown-item">Добавить в архив</a></li>
+        <?php if(in_array("draft", $allowedActions)):?>
+            <li><a href="/posts/draft/<?= $post->getId()->getValue() ?>" class="dropdown-item">Добавить в черновик</a></li>
+        <?php endif; ?>
+
+        <?php if (in_array("archived", $allowedActions)): ?>
+            <li><a href="/posts/archived/<?= $post->getId()->getValue() ?>" class="dropdown-item">Добавить в архив</a></li>
         <?php endif; ?>
         
         <?php if (in_array("delete", $allowedActions)): ?>
-            <li><a href="/posts/delete/<?= $post->getId() ?>" class="dropdown-item">Удалить</a></li>
+            <li><a href="/posts/delete/<?= $post->getId()->getValue() ?>" class="dropdown-item">Удалить</a></li>
         <?php endif; ?>
     </ul>
 </div>

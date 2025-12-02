@@ -12,16 +12,6 @@ use DomainException;
 
 class User
 {
-
-    // const STATUS_ACTIVATE = "active";
-    // const STATUS_DISABLED = "disabled";
-    // const STATUS_PENDING = "pending";
-    // private ?int $id = null;
-    // private string $email;
-    // private string $password; 
-    // private string $username;
-    // private string $status;
-
     private int $id;
     private UserId $secondaryId;
     private Email $email;
@@ -48,7 +38,7 @@ class User
         return new self($id, $secondaryId, $email, $password, $username, UserStatus::pending());
     }
 
-    // Метод используется в контроллере для создания объекта модели класса User на основе полученных данных от пользователя в момент регистрации. Собирает объект модели с уже реальными обработанными данными.
+    // Метод используется в контроллере для создания объекта модели класса User на основе полученных данных от пользователя в момент регистрации. Собирает объект модели с уже реальными обработанными данными через сервис ValidationService.
     // После чего, передаёт из в метод create() внутри репозитория для записи данных в БД.
     public static function register(Email $email, Password $password, Username $username)
     {

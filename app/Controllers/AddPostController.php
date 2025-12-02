@@ -2,22 +2,31 @@
 
 namespace App\Controllers;
 
+use App\Models\Post;
+use App\Models\ValueObject\Post\CreatorId;
+use App\Models\ValueObject\Post\Description;
+use App\Models\ValueObject\Post\ImagePost;
+use App\Models\ValueObject\Post\Title;
 use App\Repositories\PostRepository;
+use App\Services\ImageUploadService;
 use App\Services\ValidationService;
 use League\Plates\Engine;
 
 class AddPostController{
     private PostRepository $postRepo;
     private ValidationService $validationData;
+
+    private ImageUploadService $uploadImage;
     private Engine $engine;
     private $post;
     private $validationResult;
     private $template;
 
-    public function __construct(PostRepository $postRepo, ValidationService $validate, Engine $engine){
+    public function __construct(PostRepository $postRepo, ValidationService $validate, Engine $engine, ImageUploadService $uploadImage){
         $this->postRepo = $postRepo;
         $this->validationData = $validate;
         $this->template = $engine;
+        $this->uploadImage = $uploadImage;
     }
 
     public function show(){
@@ -50,7 +59,20 @@ class AddPostController{
         }
 
         if($this->validationResult->passed()) {
-            $this->postRepo->create($_SESSION["user"]["idUser"], $data["title"], $data["description"], $data["image_post"]);
+            $creatorId = new CreatorId($_SESSION["user"]["idUser"]);
+            $title = new Title($data["title"]);
+            $description = new Description($data["description"]);
+
+            // $imagePost = $this->uploadImage->upload($data["image_post"]);
+            $imgUploadPath = $this->uploadImage->upload($data["image_post"]);
+            if(!empty($imgUploadPath)) {
+                $this->uploadImage->setMimeType($data["image_post"]["type"]);
+            }
+            $imagePost = new ImagePost($imgUploadPath, $this->uploadImage->getMimeType());
+
+            $newPost = Post::newPost($creatorId, $title, $description, $imagePost);
+
+            $this->postRepo->create($newPost);
             $_SESSION["success"] = "Новый пост успешно добавлен";
             header("Location: /");
             exit();

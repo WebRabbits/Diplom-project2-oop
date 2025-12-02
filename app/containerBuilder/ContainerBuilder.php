@@ -1,7 +1,8 @@
-<?php 
+<?php
 
 namespace App\ContainerBuilder;
 
+use App\Services\ImageUploadService;
 use DI\ContainerBuilder;
 use App\Database\Connection;
 use Aura\SqlQuery\QueryFactory;
@@ -13,15 +14,15 @@ use PDO;
 $builder = new ContainerBuilder();
 
 $builder->addDefinitions([
-    PDO::class => function() {
+    PDO::class => function () {
         return Connection::Connect();
     },
 
-    QueryFactory::class => function(){
+    QueryFactory::class => function () {
         return new QueryFactory("mysql");
     },
 
-    ValidationService::class => function(){
+    ValidationService::class => function () {
         return new ValidationService();
     },
 
@@ -29,11 +30,16 @@ $builder->addDefinitions([
         return new PasswordHasher();
     },
 
-    Engine::class => function() {
+    Engine::class => function () {
         return new Engine("../app/Views");
+    },
+
+    ImageUploadService::class => function () {
+        return new ImageUploadService(
+            targetDirectory: dirname($_SERVER["DOCUMENT_ROOT"]) . "/public/img/posts/",
+            publicDirectory: "/img/posts/"
+        );
     }
 ]);
 
 $container = $builder->build();
-
-?>

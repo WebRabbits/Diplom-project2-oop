@@ -160,6 +160,7 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     $r->addRoute("POST", "/auth", ["App\Controllers\AuthController", "auth"]);
     $r->addRoute("GET", "/logout", ["App\Controllers\AuthController", "logout"]);
     $r->addRoute("GET", "/profile/{id:\d+}", ["App\Controllers\ProfileController", "showProfile"]);
+    $r->addRoute("GET", "/profile/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}", ["App\Controllers\ProfileController", "showProfile"]);
     $r->addRoute("GET", "/posts/view/{id:\d+}", ["App\Controllers\ViewPost", "viewPost"]);
     $r->addRoute("GET", "/posts/add", ["App\Controllers\AddPostController", "show"]);
     $r->addRoute("POST", "/posts/add", ["App\Controllers\AddPostController", "addNewPost"]);
@@ -167,8 +168,9 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     $r->addRoute("POST", "/posts/edit/{id:\d+}", ["App\Controllers\EditPostController", "update"]);
     // $r->addRoute("POST", "/posts/actions", ["App\Controllers\UserActionPostController", "handleActions"]);
     $r->addRoute("GET", "/posts/delete/{id:\d+}", ["App\Controllers\UserActionPostController", "delete"]);
-    $r->addRoute("GET", "/posts/active/{id:\d+}", ["App\Controllers\UserActionPostController", "active"]);
-    $r->addRoute("GET", "/posts/inactive/{id:\d+}", ["App\Controllers\UserActionPostController", "inactive"]);
+    $r->addRoute("GET", "/posts/publish/{id:\d+}", ["App\Controllers\UserActionPostController", "publish"]);
+    $r->addRoute("GET", "/posts/draft/{id:\d+}", ["App\Controllers\UserActionPostController", "draft"]);
+    $r->addRoute("GET", "/posts/archived/{id:\d+}", ["App\Controllers\UserActionPostController", "archived"]);
     // {id} must be a number (\d+)
     // $r->addRoute('GET', '/user/{id:\d+}', 'get_user_handler');
     // // The /{title} suffix is optional
